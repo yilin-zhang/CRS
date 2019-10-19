@@ -1,3 +1,10 @@
+'''
+All the configurations.
+
+To support more chord types, add a constant `SYM_XXX`, and add it to the
+`TYPE_SEQ`.
+'''
+
 # All possible chord names
 CHORD_SEQ_1 = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 CHORD_SEQ_2 = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
