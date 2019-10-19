@@ -35,9 +35,14 @@ class McGillParser():
                     continue
                 # If the line is the start of a new section
                 # process the lines of the previous section
-                if self._is_section_start_point(line) and idx > 6:
-                    chord_sequences.append(self._extract_chords(section))
-                    section = [] # clean section list
+                else:
+                    if self._is_section_start_point(line):
+                        chord_sequences.append(self._extract_chords(section))
+                        section = [] # clean section list
+                    elif self._is_transposition_start_point(line):
+                        chord_sequences.append(self._extract_chords(section))
+                        section = [] # clean section list
+                        continue # skip the current line
                 section.append(line)
             chord_sequences.append(self._extract_chords(section))
         return chord_sequences
@@ -51,6 +56,18 @@ class McGillParser():
         - A bool value
         '''
         if re.search(r'^[0-9]+\.[0-9]+(\s+|\t+)[A-Z]', line):
+            return True
+        else:
+            return False
+
+    def _is_transposition_start_point(self, line):
+        '''If the line is the start of a new key 
+        Arg:
+        - line: a line of text
+        Return:
+        - A bool value
+        '''
+        if re.search(r'^#', line):
             return True
         else:
             return False
@@ -75,8 +92,3 @@ class McGillParser():
             chords_in_line = list(map(substitute_attribute, chords_in_line))
             chords = chords + chords_in_line
         return chords
-
-if __name__ == '__main__':
-    parser = McGillParser()
-    chords = parser.parse_directory('McGill-Billboard')
-    print(chords)
