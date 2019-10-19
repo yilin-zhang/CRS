@@ -14,3 +14,6 @@ SYM_MAJ = 'maj'
 SYM_MIN = 'min'
 TYPE_SEQ = [SYM_MAJ, SYM_MIN]
 N_TYPES = len(TYPE_SEQ)
+
+# Markov chains
+MARKOV_ORDER = 2

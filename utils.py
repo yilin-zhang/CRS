@@ -39,6 +39,10 @@ def num_to_chord(chord_num):
     chord = (CHORD_SEQ_1[root_idx], TYPE_SEQ[type_idx])
     return chord
 
+def chords_to_nums(chords):
+    nums = list(map(chord_to_num, chords))
+    return nums
+
 def chord_to_onehot(chord):
     ''' Convert a chord to a one-hot array.
     Arg:
