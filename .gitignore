@@ -1,4 +1,5 @@
 /.vscode
+/__pycache__
 /.DS_Store
 /billboard-2.0-salami_chords.tar.xz
 /McGill-Billboard
