@@ -28,7 +28,7 @@ def chord_to_num(chord):
     return chord_num
 
 def num_to_chord(chord_num):
-    ''' Convert a chord to an integer number.
+    ''' Convert an integer number to a chord.
     Arg:
     - chord_num: A number, which represent a chord
     Return:
