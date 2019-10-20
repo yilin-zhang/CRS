@@ -10,4 +10,4 @@ You should unzip put the [McGill Billboard dataset](https://www.dropbox.com/s/2l
 The name of the dataset directory should be `McGill-Billboard`.
 
 The current chord prediction is using third-order Markov chain.
-You can adjust the order by changing the variable `MARKOV_ORDER` in `config.py`.
+You can adjust the order by changing the variable `MARKOV_ORDER` in `configs.py`.
