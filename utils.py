@@ -5,6 +5,7 @@ Utility functions.
 import numpy as np
 from configs import *
 
+# Chord representation conversions
 def chord_to_num(chord):
     ''' Convert a chord to an integer number.
     Arg:
@@ -93,6 +94,7 @@ def onehot_mat_to_chords(onehot_mat):
         chords.append(onehot_to_chord(onehot_mat[i, :]))
     return chords
 
+# Chord transposition
 def transpose_chord_nums(chord_nums):
     ''' Transpose a seires of chord numbers
     Arg:
@@ -118,3 +120,19 @@ def transpose_onehot_mat(onehot_mat):
     for i in range(1, 12):
         transposed_mats.append(np.roll(onehot_mat, N_TYPES*i, axis=1))
     return transposed_mats
+
+# Evaluation functions
+def get_cross_entropy(predictions, ground_truths):
+    ''' Calculate cross entropy
+    Args:
+    - predictions: A matrix, each row represents a sample.
+    - groundtruths: A matrix, each row is a one-hot array.
+    Return:
+    - cross_entropy
+    '''
+    n_samples = predictions.shape[0]
+    cross_entropy_arr = np.zeros(n_samples)
+    for i in range(n_samples):
+        cross_entropy_arr[i] = - np.sum(ground_truths * np.log(predictions))
+    cross_entropy = np.mean(cross_entropy_arr)
+    return cross_entropy

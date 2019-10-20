@@ -3,4 +3,6 @@
 /.DS_Store
 /billboard-2.0-salami_chords.tar.xz
 /McGill-Billboard
-/mini-set
+/test_chords
+/mcgill-train
+/mcgill-test
