@@ -40,6 +40,12 @@ def num_to_chord(chord_num):
     return chord
 
 def chords_to_nums(chords):
+    ''' Convert a chord sequence to a number sequence
+    Arg:
+    - chords: A sequence of chords
+    Return:
+    - nums: A sequence of chord numbers
+    '''
     nums = list(map(chord_to_num, chords))
     return nums
 
@@ -86,6 +92,20 @@ def onehot_mat_to_chords(onehot_mat):
     for i in range(onehot_mat.shape[0]):
         chords.append(onehot_to_chord(onehot_mat[i, :]))
     return chords
+
+def transpose_chord_nums(chord_nums):
+    ''' Transpose a seires of chord numbers
+    Arg:
+    - chord_nums: A list of chord numbers
+    Return
+    - transposed_list: A list of transposed chord number lists
+      [   ] <- transposed_list
+      [ ]   <- 11 transposed chord_nums
+    '''
+    transposed_list = []
+    for i in range(1, 12):
+        transposed_list.append([(x+N_TYPES*i) % (N_TYPES*12) for x in chord_nums])
+    return transposed_list
 
 def transpose_onehot_mat(onehot_mat):
     ''' Transpose a one-hot matrix (a chord sequence).

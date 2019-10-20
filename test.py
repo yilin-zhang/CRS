@@ -1,6 +1,5 @@
 import unittest
 import numpy as np
-from mcgill_parser import McGillParser
 from utils import *
 
 class TestUtils(unittest.TestCase):

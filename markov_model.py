@@ -8,8 +8,8 @@ class MarkovModel():
                                  dtype=np.uint)
 
     def train(self, seqs):
-        self._feed_seqs(seqs)
-        self._normalize()
+        self.feed_seqs(seqs)
+        self._ormalize()
 
     def predict(self, seq):
         seq_len = len(seq)
@@ -25,7 +25,7 @@ class MarkovModel():
         self.freq_mat = np.zeros((12*N_TYPES,)*(self.order+1),
                                  dtype=np.uint)
 
-    def _feed_seq(self, seq):
+    def feed_seq(self, seq):
         '''Feed a sequence into the model.
         Arg:
         - seq: A sequence, which contains the information of state transitions
@@ -39,15 +39,15 @@ class MarkovModel():
             idx = tuple(seq[i: i+self.order+1])
             self.freq_mat[idx] += 1
 
-    def _feed_seqs(self, seqs):
+    def feed_seqs(self, seqs):
         '''Feed several sequences into the model.
         Arg:
         - seq: A list, which contains multiple sequences
         '''
         for seq in seqs:
-            self._feed_seq(seq)
+            self.feed_seq(seq)
     
-    def _normalize(self):
+    def normalize(self):
         trans_prob_mat = np.zeros((12*N_TYPES,)*(self.order+1))
         for i in range(12*N_TYPES):
             trans_prob_mat[:, :, i] = self.freq_mat[:, :, i] / np.sum(self.freq_mat[:, :, i])

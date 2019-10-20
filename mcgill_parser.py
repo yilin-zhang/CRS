@@ -15,20 +15,18 @@ import os
 
 class McGillParser():
     def parse_directory(self, dirname):
-        dir_chords = []
         for root, _, files in os.walk(dirname):
             for filename in files:
                 # only parse the file if the extension is txt
                 if os.path.splitext(filename)[1] == '.txt':
                     filename = os.path.join(root, filename) 
-                    dir_chords.append(self.parse_file(filename))
-        return dir_chords
+                    for chords in self.parse_file(filename):
+                        yield chords
 
     def parse_file(self, filename):
         '''Parsing the file'''
         with open(filename, 'r') as lines:
             section = []
-            chord_sequences = []
             for idx, line in enumerate(lines):
                 # 0~3 meta data, 4 blank line, 5 silence
                 if idx <= 5:
@@ -37,15 +35,19 @@ class McGillParser():
                 # process the lines of the previous section
                 else:
                     if self._is_section_start_point(line):
-                        chord_sequences.append(self._extract_chords(section))
+                        chords = self._extract_chords(section)
+                        # only export chords when it's not empty
+                        if chords:
+                            yield chords
                         section = [] # clean section list
                     elif self._is_transposition_start_point(line):
-                        chord_sequences.append(self._extract_chords(section))
+                        chords = self._extract_chords(section)
+                        # only export chords when it's not empty
+                        if chords:
+                            yield chords
                         section = [] # clean section list
                         continue # skip the current line
                 section.append(line)
-            chord_sequences.append(self._extract_chords(section))
-        return chord_sequences
 
 
     def _is_section_start_point(self, line):
