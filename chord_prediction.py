@@ -19,7 +19,7 @@ for chords in parser.parse_directory('McGill-Billboard'):
 markov.normalize()
 
 # Test the result
-progression = [('C', 'maj'), ('A', 'min'), ('G', 'maj')]
+progression = [('C', 'maj'), ('A', 'min'), ('F', 'maj')]
 chord_seq = chords_to_nums(progression)
 prediction = markov.predict(chord_seq)
 order = np.argsort(prediction)[::-1].tolist()
