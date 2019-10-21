@@ -136,10 +136,10 @@ def compute_chromagram(audio, block_size, hop_size):
     Y = np.abs(X) ** 2
     Y_LF, F_coef_pitch = compute_Y_LF(Y, fs, block_size)
     C = chromgram(Y_LF)
-    return C
+    return C, timestamp
 
 
-C = compute_chromagram('test_chords/Grand Piano - Fazioli - major A middle.wav', 4096, 2048)
+C, timestamp = compute_chromagram('test_chords/Grand Piano - Fazioli - major D middle.wav', 4096, 2048)
 print(C)
 
 # This is the template matching based classifier
@@ -147,7 +147,7 @@ print(C)
 with open('chord_templates.json', 'r') as fp:
     templates_json = json.load(fp)
 
-chords = ['N','G','G#','A','A#','B','C','C#','D','D#','E','F','F#','Gm','G#m','Am','A#m','Bm','Cm','C#m','Dm','D#m','Em','Fm','F#m']
+chords = ['N','C','C#','D','D#','E','F','F#','G','G#','A','A#','B','Cm','C#m','Dm','D#m','Em','Fm','F#m', 'Gm','G#m','Am','A#m','Bm']
 templates = []
 
 for chord in chords:
@@ -158,7 +158,7 @@ for chord in chords:
 nFrames =C.shape[1]
 
 id_chord = np.zeros(nFrames, dtype='int32')
-timestamp = np.zeros(nFrames)
+# timestamp = np.zeros(nFrames)
 max_cor = np.zeros(nFrames)
 
 for n in range(nFrames):
@@ -169,27 +169,31 @@ for n in range(nFrames):
     max_cor[n] = np.max(cor_vec)
     id_chord[n] = np.argmax(cor_vec) + 1
 
+# print(max_cor)
+
 
 #if max_cor[n] < threshold, then no chord is played
 #might need to change threshold value
 id_chord[np.where(max_cor < 0.8*np.max(max_cor))] = 0
 # for n in range(nFrames):
-	# print(timestamp[n],chords[id_chord[n]])
+# 	print(timestamp[n],chords[id_chord[n]])
 
 
 #Plotting all figures
 plt.figure(1)
-notes = ['G','G#','A','A#','B','C','C#','D','D#','E','F','F#']
+notes = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
 plt.xticks(np.arange(12),notes)
 plt.title('Pitch Class Profile')
 plt.xlabel('Note')
 plt.grid(True)
-
-# plt.figure(2)
-# plt.yticks(np.arange(25), chords)
-# plt.plot(t, id_chord)
-# plt.xlabel('Time in seconds')
-# plt.ylabel('Chords')
-# plt.title('Identified chords')
-# plt.grid(True)
+plt.plot(C, notes)
 # plt.show()
+
+plt.figure(2)
+plt.yticks(np.arange(25), chords)
+plt.plot(timestamp, id_chord)
+plt.xlabel('Time in seconds')
+plt.ylabel('Chords')
+plt.title('Identified chords')
+plt.grid(True)
+plt.show()
