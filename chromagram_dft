@@ -7,25 +7,29 @@ from matplotlib import pyplot as plt
 import librosa
 from scipy.io.wavfile import read
 
-fs, x = read('AMaj.wav')
+# This function reads audio file and outputs a normalized audio array
+def audio_read(audio):
+    fs, x = read(audio)
 
-if len(x.shape) > 1:
-    y = x[:, 0]
+    if len(x.shape) > 1:
+        y = x[:, 0]
 
-if x.dtype == 'uint8':
-    y = (y / 128.) - 1
-else:
-    bits = x.dtype.itemsize * 8
-    y = y / (2 ** (bits - 1))
+    if x.dtype == 'uint8':
+        y = (y / 128.) - 1
+    else:
+        bits = x.dtype.itemsize * 8
+        y = y / (2 ** (bits - 1))
+    return y
 
 
-# Computation of STFT
-N = 4096
-H = 1024
-w = scipy.signal.get_window('hann', N)
-X = librosa.stft(y, n_fft=N, hop_length=H, win_length=N, window=w, pad_mode='constant')
-t = librosa.frames_to_time(np.arange(X.shape[1]), sr=fs, hop_length=H, n_fft=N)
-
+def compute_stft(audio, block_size, hop_size):
+    # Computation of STFT
+    N = block_size
+    H = hop_size
+    w = scipy.signal.get_window('hann', N)
+    X = librosa.stft(y, n_fft=N, hop_length=H, win_length=N, window=w, pad_mode='constant')
+    t = librosa.frames_to_time(np.arange(X.shape[1]), sr=fs, hop_length=H, n_fft=N)
+    return X, t
 
 def F_pitch(p, pitch_ref=69, freq_ref=440):
     """Computes the center frequency/ies of a MIDI pitch
@@ -105,10 +109,8 @@ def compute_Y_LF(Y, Fs, N):
     F_coef_pitch = np.arange(128)
     return Y_LF, F_coef_pitch
 
-Y = np.abs(X) ** 2
-Y_LF, F_coef_pitch = compute_Y_LF(Y, fs, N)
 
-def compute_chromgram(Y_LF):
+def chromgram(Y_LF):
     """Computes a chromagram
 
     Notebook: C3/C3S1_SpecLogFreq-Chromagram.ipynb
@@ -126,8 +128,19 @@ def compute_chromgram(Y_LF):
         C[c, :] = Y_LF[mask, :].sum(axis=0)
     return C
 
-C = compute_chromgram(Y_LF)
 
+# This is the caller function that takes in audio and outputs Chromagram
+def compute_chromagram(audio, block_size, hop_size):
+    X, timestamp = compute_stft(audio, block_size, hop_size)
+    Y = np.abs(X) ** 2
+    Y_LF, F_coef_pitch = compute_Y_LF(Y, fs, N)
+    C = compute_chromgram(Y_LF)
+    return C
+
+
+compute_chromagram('')
+
+# This is the template matching based classifier
 
 with open('chord_templates.json', 'r') as fp:
     templates_json = json.load(fp)
