@@ -19,15 +19,15 @@ def audio_read(audio):
     else:
         bits = x.dtype.itemsize * 8
         y = y / (2 ** (bits - 1))
-    return y
+    return y, fs
 
 
-def compute_stft(audio, block_size, hop_size):
+def compute_stft(audio, block_size, hop_size, fs):
     # Computation of STFT
     N = block_size
     H = hop_size
     w = scipy.signal.get_window('hann', N)
-    X = librosa.stft(y, n_fft=N, hop_length=H, win_length=N, window=w, pad_mode='constant')
+    X = librosa.stft(audio, n_fft=N, hop_length=H, win_length=N, window=w, pad_mode='constant')
     t = librosa.frames_to_time(np.arange(X.shape[1]), sr=fs, hop_length=H, n_fft=N)
     return X, t
 
@@ -131,14 +131,16 @@ def chromgram(Y_LF):
 
 # This is the caller function that takes in audio and outputs Chromagram
 def compute_chromagram(audio, block_size, hop_size):
-    X, timestamp = compute_stft(audio, block_size, hop_size)
+    y, fs = audio_read(audio)
+    X, timestamp = compute_stft(y, block_size, hop_size, fs)
     Y = np.abs(X) ** 2
-    Y_LF, F_coef_pitch = compute_Y_LF(Y, fs, N)
-    C = compute_chromgram(Y_LF)
+    Y_LF, F_coef_pitch = compute_Y_LF(Y, fs, block_size)
+    C = chromgram(Y_LF)
     return C
 
 
-compute_chromagram('')
+C = compute_chromagram('test_chords/Grand Piano - Fazioli - major A middle.wav', 4096, 2048)
+print(C)
 
 # This is the template matching based classifier
 
@@ -167,7 +169,6 @@ for n in range(nFrames):
     max_cor[n] = np.max(cor_vec)
     id_chord[n] = np.argmax(cor_vec) + 1
 
-print(id_chord)
 
 #if max_cor[n] < threshold, then no chord is played
 #might need to change threshold value
@@ -184,11 +185,11 @@ plt.title('Pitch Class Profile')
 plt.xlabel('Note')
 plt.grid(True)
 
-plt.figure(2)
-plt.yticks(np.arange(25), chords)
-plt.plot(t, id_chord)
-plt.xlabel('Time in seconds')
-plt.ylabel('Chords')
-plt.title('Identified chords')
-plt.grid(True)
-plt.show()
+# plt.figure(2)
+# plt.yticks(np.arange(25), chords)
+# plt.plot(t, id_chord)
+# plt.xlabel('Time in seconds')
+# plt.ylabel('Chords')
+# plt.title('Identified chords')
+# plt.grid(True)
+# plt.show()
