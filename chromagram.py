@@ -1,118 +1,104 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import scipy.signal as signal2
 import math
-import wave, pylab
-import operator
+import scipy as sp
+from scipy.io.wavfile import read
 
-# FFT Size
-Nfft = 2048
 
-# Chroma centered on A4 = 440Hz
-A4 = 440
+block_size = 4096
+hop_size = 256
 
-# Number of chroma bins
-nbin = 12
 
-# Semitone
-st = 2 ** (1 / float(nbin))
+def block_audio(x, blockSize, hopSize, fs):
+    """
+    Sample audio blocking code from Alex
+    """
+    # allocate memory
+    numBlocks = int(np.ceil(x.size / hopSize))
+    xb = np.zeros([numBlocks, blockSize])
 
-# Step
-step = 128
+    # compute time stamps
+    t = (np.arange(0, numBlocks) * hopSize) / fs
+    x = np.concatenate((x, np.zeros(blockSize)), axis=0)
+    for n in range(0, numBlocks):
+        i_start = n * hopSize
+        i_stop = np.min([x.size - 1, i_start + blockSize - 1])
 
-# Used for Downsample Signal
-fr = 11025
+        xb[n][np.arange(0, blockSize)] = x[np.arange(i_start, i_stop + 1)]
 
-# DownSample Factor
-df = 4
+    return xb, t
 
-tunechroma1 = [np.log2(A4 * st ** i) for i in range(nbin)]
-tunechroma2 = [int(np.log2(A4 * st ** i)) for i in range(nbin)]
+def compute_hann(iWindowLength):
+    """
+    Sample compute hann window code from Alex
+    """
+    return 0.5 - (0.5 * np.cos(2 * np.pi / iWindowLength * np.arange(iWindowLength)))
 
-chroma = np.asarray(tunechroma1) - np.asarray(tunechroma2)
 
-spf = wave.open('AMaj.wav', 'r')
+def compute_stft(filepath):
+    fs, x = read(filepath)
 
-# Extract Raw Audio from Wav File
-signal = spf.readframes(-1)
-signal = np.fromstring(signal, 'Int16')
-fs = spf.getframerate()
+    if len(x.shape) > 1:
+        x = x[:,1]
 
-plt.figure(1)
-plt.title('Signal Wave...')
-plt.plot(signal)
+    xb, t = block_audio(x, block_size, hop_size, fs)
 
-# Starting DownSample signal using Decimation
-b = signal2.firwin(30, 1.0 / df)
-signal = signal2.lfilter(b, 1., signal)
-signal = signal.swapaxes(0, -1)[30 + 1::4].swapaxes(0, -1)
+    numBlocks = xb.shape[0]
+    afWindow = compute_hann(xb.shape[1])
+    X = np.zeros([math.ceil(xb.shape[1] / 2 + 1), numBlocks])
 
-plt.figure(2)
+    for n in range(0, numBlocks):
+        # apply window
+        tmp = abs(sp.fft(xb[n, :] * afWindow)) * 2 / xb.shape[1]
 
-plt.title('Downsampled Signal...')
-plt.plot(signal)
+        # compute magnitude spectrum
+        X[:, n] = tmp[range(math.ceil(tmp.size / 2 + 1))]
+        X[[0, math.ceil(tmp.size / 2)], n] = X[[0, math.ceil(tmp.size / 2)], n] / np.sqrt(
+            2)  # let's be pedantic about normalization
 
-fs = fs / df
+    return X, fs, t
 
-step = Nfft - step
+def extract_pitch_chroma(X, fs, tfInHz):
+   block_length = X.shape[0]
+   num_blocks = X.shape[1]
+   pitch_chroma = np.zeros((12, block_length), dtype=np.int16)
 
-Pxx, freqs, bins, im = pylab.specgram(signal, Fs=fs, window=np.hamming(Nfft), NFFT=Nfft, noverlap=step, Fc=0)
+   Y = np.abs(X) ** 2
 
-freqs = freqs[1:, ]
+   # Need to calculate pitch chroma from C3 to B5 --> 48 to 83
+   lower_bound = 48
+   upper_bound = 84
 
-freqschroma = np.asarray(np.log2(freqs)) - np.asarray([int(np.log2(f)) for f in freqs])
+   k = np.arange(1, (block_length+1))
+   k_freq = k * fs / (2 * (block_length-1))
 
-nchroma = len(chroma)
-nfreqschroma = len(freqschroma)
+   irange = (upper_bound-lower_bound)
 
-CD = np.zeros((nfreqschroma, nchroma))
+   logfreq_X = np.zeros([irange, num_blocks])
 
-for i in range(nchroma):
-    CD[:, i] = np.abs(freqschroma - chroma[i])
+   for n, i in enumerate(range(lower_bound, upper_bound)):
 
-FlipMatrix = np.flipud(CD)
+       midi_pitch_lower = 2 ** (((i - 0.5) - 69) / 12) * tfInHz
+       midi_pitch_upper = 2 ** (((i + 0.5) - 69) / 12) * tfInHz
 
-min_index = []
-min_value = []
+       mask = np.logical_and(midi_pitch_lower <= k_freq, k_freq < midi_pitch_upper)
 
-for i in reversed(range(FlipMatrix.shape[0])):
-    index, value = min(enumerate(FlipMatrix[i]), key=operator.itemgetter(1))
-    min_index.append(index)
-    min_value.append(value)
+       logfreq_X[n, :] = Y[k[mask], :].sum(axis=0)
 
-# Numpy Array for Chroma Scale population
-CS = np.zeros((len(chroma), Pxx.shape[1]))
 
-Magnitude = np.log(abs(Pxx[1:, ]))
+   pitch_chroma = np.zeros((12, logfreq_X.shape[1]))
+   p = np.arange(48,84)
+   for c in range(12):
+       mask = (p % 12) == c
+       pitch_chroma[c, :] = logfreq_X[mask, :].sum(axis=0)
 
-for i in range(CS.shape[0]):
+   idx = [7,8,9,10,11,0,1,2,3,4,5,6]
+   # idx = [8,7,6,5,4,3,2,1,0,11,10,9]
 
-    # Find index value in min_index list
-    a = [index for index, x in enumerate(min_index) if x == i]
+   pitch_chroma = pitch_chroma[idx, :]
 
-    # Numpy Array for values in each index
-    AIndex = np.zeros((len(a), Pxx.shape[1]))
+   l2norm = np.linalg.norm(pitch_chroma, ord=2, axis=0)
+   l2norm[l2norm == 0] = 1
+   pitch_chroma /= l2norm
 
-    t = 0;
-    for value in a:
-        AIndex[t, :] = Magnitude[value, :]
-        t = t + 1
-
-    MeanMag = []
-    for M in AIndex.T:
-        MeanMag.append(np.mean(M))
-
-    CS[i, :] = MeanMag
-
-# normalize the chromagram array
-CS = CS / CS.max()
-
-plt.figure(3)
-plt.title('Original Magnitude')
-plt.imshow(Magnitude.astype('float64'), interpolation='nearest', origin='lower', aspect='auto')
-
-plt.figure(4)
-plt.title('Chromagram')
-plt.imshow(CS.astype('float64'), interpolation='nearest', origin='lower', aspect='auto')
-
-# plt.show()
+   return pitch_chroma
