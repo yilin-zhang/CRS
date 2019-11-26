@@ -1,7 +1,7 @@
 # Chord Detection and Prediction
 
 ## Chord Detection
-Run `chromagram.py`.
+Run `chroma_chord_detection.py`.
 
 ## Chord Prediction
 Run `chord_prediction.py`.
