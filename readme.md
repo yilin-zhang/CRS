@@ -11,3 +11,18 @@ The name of the dataset directory should be `McGill-Billboard`.
 
 The current chord prediction is using third-order Markov chain.
 You can adjust the order by changing the variable `MARKOV_ORDER` in `configs.py`.
+
+
+###########REFERENCES#################
+
+Chord Detection:
+
+1. Automatic Chord Recognition from Audio Using Enhanced Pitch Class Profile, https://pdfs.semanticscholar.org/30a9/0af7c214f423743472e0c82f2b5332ccb55f.pdf
+
+
+2. 
+
+
+Chord Recommendation:
+
+1. 
