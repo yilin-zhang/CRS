@@ -3,6 +3,9 @@
 ## Chord Detection
 Run `chroma_chord_detection.py`.
 
+Change the file name in main in function argument.
+
+
 ## Chord Prediction
 Run `chord_prediction.py`.
 
