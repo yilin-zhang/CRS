@@ -1,10 +1,10 @@
 import json
 import numpy as np
 import matplotlib.pyplot as plt
-from chromagram import extract_pitch_chroma
-from chromagram import compute_stft
+from chord_detection.chromagram import extract_pitch_chroma
+from chord_detection.chromagram import compute_stft
 
-with open('chord_templates.json', 'r') as fp:
+with open('chord_detection/chord_templates.json', 'r') as fp:
     templates_json = json.load(fp)
 
 chords = ['N','G','G#','A','A#','B','C','C#','D','D#','E','F','F#','Gm','G#m','Am','A#m','Bm','Cm','C#m','Dm','D#m','Em','Fm','F#m']

@@ -1,8 +1,15 @@
+# cache and configurations
 /.vscode
 /__pycache__
 /.DS_Store
+# dataset
 /billboard-2.0-salami_chords.tar.xz
 /McGill-Billboard
 /test_chords
 /mcgill-train
 /mcgill-test
+# packages
+/chord_detection/__pycache__
+/chord_detection/*.pyc
+/chord_recommendation/__pycache__
+/chord_recommendation/*.pyc

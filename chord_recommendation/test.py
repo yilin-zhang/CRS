@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from utils import *
+from chord_recommendation.utils import *
 
 class TestUtils(unittest.TestCase):
     def test_chord_conversion(self):

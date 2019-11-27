@@ -1,7 +1,7 @@
-from mcgill_parser import McGillParser
-from markov_model import MarkovModel
-from utils import *
-from configs import MARKOV_ORDER
+from chord_recommendation.mcgill_parser import McGillParser
+from chord_recommendation.markov_model import MarkovModel
+from chord_recommendation.utils import *
+from chord_recommendation.configs import MARKOV_ORDER
 
 # Initialize parser and markov model
 parser = McGillParser()

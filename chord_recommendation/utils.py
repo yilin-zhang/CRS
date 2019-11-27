@@ -3,7 +3,7 @@ Utility functions.
 '''
 
 import numpy as np
-from configs import *
+from chord_recommendation.configs import *
 
 # Chord representation conversions
 def chord_to_num(chord):

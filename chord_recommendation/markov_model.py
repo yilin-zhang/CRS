@@ -1,4 +1,4 @@
-from configs import MARKOV_ORDER, N_TYPES
+from chord_recommendation.configs import MARKOV_ORDER, N_TYPES
 import numpy as np
 
 class MarkovModel():
