@@ -12,9 +12,10 @@ The structure of the list:
 
 import re
 import os
+from typing import *
 
 class McGillParser():
-    def parse_directory(self, dirname):
+    def parse_directory(self, dirname: str) -> Iterator[List[Tuple[str, str]]]:
         for root, _, files in os.walk(dirname):
             for filename in files:
                 # only parse the file if the extension is txt
@@ -23,7 +24,7 @@ class McGillParser():
                     for chords in self.parse_file(filename):
                         yield chords
 
-    def parse_file(self, filename):
+    def parse_file(self, filename: str) -> Iterator[List[Tuple[str, str]]]:
         '''Parsing the file'''
         with open(filename, 'r') as lines:
             section = []
@@ -50,7 +51,7 @@ class McGillParser():
                 section.append(line)
 
 
-    def _is_section_start_point(self, line):
+    def _is_section_start_point(self, line: str) -> bool:
         '''If the line is the start of a new section
         Arg:
         - line: a line of text
@@ -62,7 +63,7 @@ class McGillParser():
         else:
             return False
 
-    def _is_transposition_start_point(self, line):
+    def _is_transposition_start_point(self, line: str) -> bool:
         '''If the line is the start of a new key 
         Arg:
         - line: a line of text
@@ -74,14 +75,14 @@ class McGillParser():
         else:
             return False
 
-    def _extract_chords(self, section):
+    def _extract_chords(self, section: List[str]) -> List[Tuple[str, str]]:
         '''Extract chords from a section
         Arg:
         - section: A list of several lines of verse or chorus.
         Return:
         - chords: A list of chords
         '''
-        def substitute_attribute(chord):
+        def substitute_attribute(chord: Tuple[str, str]) -> Tuple[str, str]:
             '''chord example: ('A', 'maj')'''
             attr = chord[1]
             if attr != 'maj' and attr != 'min':

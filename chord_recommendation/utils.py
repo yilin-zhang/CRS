@@ -1,17 +1,17 @@
 '''
 Utility functions.
 '''
-
+from typing import *
 import numpy as np
 from chord_recommendation.configs import *
 
 # Chord representation conversions
-def chord_to_num(chord):
+def chord_to_id(chord: Tuple[str, str]) -> int:
     ''' Convert a chord to an integer number.
     Arg:
     - chord: A tuple, such as ('C', 'maj')
     Return:
-    - chord_num: A number, which represent a chord
+    - chord_id: A number, which represent a chord
     '''
     root_note, chord_type = chord
 
@@ -20,37 +20,37 @@ def chord_to_num(chord):
     except ValueError:
         root_idx = CHORD_SEQ_2.index(root_note)
 
-    chord_num = None
+    chord_id = 0
 
     for idx, type_name in enumerate(TYPE_SEQ):
         if chord_type == type_name:
-            chord_num = root_idx * N_TYPES + idx
+            chord_id = root_idx * N_TYPES + idx
     
-    return chord_num
+    return chord_id
 
-def num_to_chord(chord_num):
+def id_to_chord(chord_id: int) -> Tuple[str, str]:
     ''' Convert an integer number to a chord.
     Arg:
-    - chord_num: A number, which represent a chord
+    - chord_id: A number, which represent a chord
     Return:
     - chord: A tuple, such as ('C', 'maj')
     '''
-    root_idx = chord_num // N_TYPES
-    type_idx = chord_num % N_TYPES
+    root_idx = chord_id // N_TYPES
+    type_idx = chord_id % N_TYPES
     chord = (CHORD_SEQ_1[root_idx], TYPE_SEQ[type_idx])
     return chord
 
-def chords_to_nums(chords):
+def chords_to_ids(chords: List[Tuple[str, str]]) -> List[int]:
     ''' Convert a chord sequence to a number sequence
     Arg:
     - chords: A sequence of chords
     Return:
-    - nums: A sequence of chord numbers
+    - ids: A sequence of chord numbers
     '''
-    nums = list(map(chord_to_num, chords))
-    return nums
+    ids = list(map(chord_to_id, chords))
+    return ids
 
-def chord_to_onehot(chord):
+def chord_to_onehot(chord: Tuple[str, str]) -> np.array:
     ''' Convert a chord to a one-hot array.
     Arg:
     - chord: A tuple, such as ('C', 'maj')
@@ -58,10 +58,10 @@ def chord_to_onehot(chord):
     - onehot: A one-hot array. Order: [Cmaj, Cmin, C#maj, C#min, ...]
     '''
     onehot = np.zeros(12*N_TYPES)
-    onehot[chord_to_num(chord)] = 1
+    onehot[chord_to_id(chord)] = 1
     return onehot
 
-def onehot_to_chord(onehot):
+def onehot_to_chord(onehot: np.array) -> Tuple[str, str]:
     ''' Convert a one-hot array to a chord.
     Arg:
     - onehot: A one-hot array. Order: [Cmaj, Cmin, C#maj, C#min, ...]
@@ -69,10 +69,10 @@ def onehot_to_chord(onehot):
     - chord: A tuple, such as ('C', 'maj')
     '''
     idx = np.where(onehot == 1)[0].tolist()[0]
-    chord = num_to_chord(idx)
+    chord = id_to_chord(idx)
     return chord
 
-def chords_to_onehot_mat(chords):
+def chords_to_onehot_mat(chords: List[Tuple[str, str]]) -> np.array:
     ''' Convert chords to a series of one-hot arrays (a matrix)
     Arg:
     - chords: A sequence of chords
@@ -82,7 +82,7 @@ def chords_to_onehot_mat(chords):
     onehot_mat = np.array(list(map(chord_to_onehot, chords)))
     return onehot_mat
 
-def onehot_mat_to_chords(onehot_mat):
+def onehot_mat_to_chords(onehot_mat: np.array) -> List[Tuple[str, str]]:
     ''' Convert a one-hot matrix to chords.
     Arg:
     - onehot_mat: A one-hot matrix
@@ -95,21 +95,21 @@ def onehot_mat_to_chords(onehot_mat):
     return chords
 
 # Chord transposition
-def transpose_chord_nums(chord_nums):
+def transpose_chord_ids(chord_ids: List[int]) -> List[List[int]]:
     ''' Transpose a seires of chord numbers
     Arg:
-    - chord_nums: A list of chord numbers
+    - chord_ids: A list of chord numbers
     Return
     - transposed_list: A list of transposed chord number lists
       [   ] <- transposed_list
-      [ ]   <- 11 transposed chord_nums
+      [ ]   <- 11 transposed chord_ids
     '''
     transposed_list = []
     for i in range(1, 12):
-        transposed_list.append([(x+N_TYPES*i) % (N_TYPES*12) for x in chord_nums])
+        transposed_list.append([(x+N_TYPES*i) % (N_TYPES*12) for x in chord_ids])
     return transposed_list
 
-def transpose_onehot_mat(onehot_mat):
+def transpose_onehot_mat(onehot_mat: np.array) -> List[np.array]:
     ''' Transpose a one-hot matrix (a chord sequence).
     Arg:
     - onehot_mat: A one-hot matrix
@@ -122,7 +122,7 @@ def transpose_onehot_mat(onehot_mat):
     return transposed_mats
 
 # Evaluation functions
-def get_cross_entropy(predictions, ground_truths):
+def get_cross_entropy(predictions: np.array, ground_truths: np.array) -> float:
     ''' Calculate cross entropy
     Args:
     - predictions: A matrix, each row represents a sample.

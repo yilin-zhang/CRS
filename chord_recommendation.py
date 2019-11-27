@@ -15,13 +15,13 @@ n_seqs = 0
 for chords in parser.parse_directory('mcgill-test'):
     if len(chords) < MARKOV_ORDER + 1:
         continue
-    chord_nums = chords_to_nums(chords)
+    chord_ids = chords_to_ids(chords)
     onehot_mat = chords_to_onehot_mat(chords)
     ground_truths = onehot_mat[MARKOV_ORDER:]
     predictions = np.zeros((onehot_mat.shape[0]-MARKOV_ORDER,
                             onehot_mat.shape[1]))
     for i in range(len(chords) - MARKOV_ORDER):
-        state = chord_nums[i: i+MARKOV_ORDER]
+        state = chord_ids[i: i+MARKOV_ORDER]
         predictions[i, :] = markov.predict(state)
 
     mean_cross_entropy += get_cross_entropy(predictions, ground_truths)
@@ -31,10 +31,10 @@ print('cross entropy:', mean_cross_entropy)
 
 # Test the result
 def predict_chords(progression):
-    chord_seq = chords_to_nums(progression)
+    chord_seq = chords_to_ids(progression)
     prediction = markov.predict(chord_seq)
     order = np.argsort(prediction)[::-1].tolist()
-    predicted_chords = list(map(num_to_chord, order))
+    predicted_chords = list(map(id_to_chord, order))
     return predicted_chords
 
 progression_1 = [('C', 'maj'), ('A', 'min'), ('F', 'maj')]

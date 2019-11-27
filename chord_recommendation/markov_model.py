@@ -1,5 +1,6 @@
 from chord_recommendation.configs import MARKOV_ORDER, N_TYPES
 from contextlib import contextmanager
+from typing import *
 import warnings
 import pickle
 import numpy as np
@@ -11,8 +12,9 @@ class MarkovModel():
                                  dtype=np.uint)
         self._is_trained = False
 
-    def train(self, seqs):
-        self._feed_seqs(seqs)
+    def train(self, seqs: List[List[int]]):
+        ''' Train the model based on chord id '''
+        self.feed_seqs(seqs)
         self._normalize()
         self._is_trained = True
 
@@ -25,7 +27,7 @@ class MarkovModel():
         self._normalize()
         self._is_trained = True
 
-    def predict(self, seq):
+    def predict(self, seq: List[int]) -> np.float:
         seq_len = len(seq)
         if seq_len < self._order:
             raise ValueError(
@@ -40,7 +42,7 @@ class MarkovModel():
                                  dtype=np.uint)
         self._is_trained = False
 
-    def feed_seq(self, seq):
+    def feed_seq(self, seq: List[int]):
         '''Feed a sequence into the model.
         Arg:
         - seq: A sequence, which contains the information of state transitions
@@ -54,7 +56,7 @@ class MarkovModel():
             idx = tuple(seq[i: i+self._order+1])
             self._freq_mat[idx] += 1
 
-    def feed_seqs(self, seqs):
+    def feed_seqs(self, seqs: List[List[int]]):
         '''Feed several sequences into the model.
         Arg:
         - seq: A list, which contains multiple sequences
@@ -68,7 +70,7 @@ class MarkovModel():
             trans_prob_mat[:, :, i] = self._freq_mat[:, :, i] / np.sum(self._freq_mat[:, :, i])
         self.trans_prob_mat = trans_prob_mat
     
-    def serialize(self, path):
+    def serialize(self, path: str):
         ''' Serialize the transition probability matrix.
         Arg:
         - path: The path to the serialized file
