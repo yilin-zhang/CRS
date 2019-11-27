@@ -1,22 +1,13 @@
-from chord_recommendation.mcgill_parser import McGillParser
 from chord_recommendation.markov_model import MarkovModel
+from chord_recommendation.mcgill_parser import McGillParser
 from chord_recommendation.utils import *
 from chord_recommendation.configs import MARKOV_ORDER
+from config import *
 
-# Initialize parser and markov model
+# Initialize
+markov = MarkovModel(MARKOV_ORDER)
+markov.load(MARKOV_MODEL_PATH)
 parser = McGillParser()
-markov = MarkovModel(order=MARKOV_ORDER)
-
-# Parse the training set, and feed the data into the model
-for chords in parser.parse_directory('mcgill-train'):
-    if len(chords) < MARKOV_ORDER + 1:
-        continue
-    chord_nums = chords_to_nums(chords)
-    chord_seqs = [chord_nums] + transpose_chord_nums(chord_nums)
-    markov.feed_seqs(chord_seqs)
-
-# Get the transition probability matrix
-markov.normalize()
 
 # Parse the testing set, and get the cross entropy
 mean_cross_entropy = 0

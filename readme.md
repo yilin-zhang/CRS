@@ -13,7 +13,9 @@ The dataset we use is [McGill Billboard dataset](https://www.dropbox.com/s/2lvny
 The current chord prediction is using third-order Markov chain.
 You can adjust the order by changing the variable `MARKOV_ORDER` in `configs.py`.
 
-Run `chord_recommendation.py`.
+If this is the first time running the program, run `setup.py` first.
+
+Run `chord_recommendation.py` to get prediction and evaluation.
 
 # References
 
