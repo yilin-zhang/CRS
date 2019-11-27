@@ -1,6 +1,4 @@
 from chord_recommendation.markov_model import MarkovModel
-from chord_recommendation.mcgill_parser import McGillParser
-from chord_recommendation.utils import *
 from chord_recommendation.configs import MARKOV_ORDER
 from config import *
 from evaluation import cross_entropy
@@ -8,7 +6,6 @@ from evaluation import cross_entropy
 # Initialize
 markov = MarkovModel(MARKOV_ORDER)
 markov.load(MARKOV_MODEL_PATH)
-parser = McGillParser()
 
 # Parse the testing set, and get the cross entropy
 ce = cross_entropy(markov, TEST_PATH)
