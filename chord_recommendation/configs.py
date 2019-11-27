@@ -5,8 +5,6 @@ To support more chord types, add a constant `SYM_XXX`, and add it to the
 `TYPE_SEQ`.
 '''
 
-from typing import *
-
 # All possible chord names
 CHORD_SEQ_1 = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 CHORD_SEQ_2 = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
@@ -19,3 +17,11 @@ N_TYPES = len(TYPE_SEQ)
 
 # Markov chains
 MARKOV_ORDER = 3
+
+# RNN
+N_STEPS = 3
+N_INPUT = N_TYPES * 12
+N_NEURONS = 64
+DROUPOUT_RATE = 0.3
+BATCH_SIZE = 5
+N_EPOCHS = 50

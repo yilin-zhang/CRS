@@ -15,6 +15,8 @@ You can adjust the order by changing the variable `MARKOV_ORDER` in `configs.py`
 
 If this is the first time running the program, run `setup.py` first.
 
+Execute `python setup.py rnn` for training RNN model, `python setup.py markov` for training Markov chains.
+
 Run `chord_recommendation.py` to get prediction and evaluation.
 
 # References

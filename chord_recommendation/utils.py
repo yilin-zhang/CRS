@@ -4,6 +4,7 @@ Utility functions.
 from typing import *
 import numpy as np
 from chord_recommendation.configs import *
+from chord_recommendation.mcgill_parser import McGillParser
 
 # Chord representation conversions
 def chord_to_id(chord: Tuple[str, str]) -> int:
@@ -50,7 +51,7 @@ def chords_to_ids(chords: List[Tuple[str, str]]) -> List[int]:
     ids = list(map(chord_to_id, chords))
     return ids
 
-def chord_to_onehot(chord: Tuple[str, str]) -> np.array:
+def chord_to_onehot(chord: Tuple[str, str]) -> np.ndarray:
     ''' Convert a chord to a one-hot array.
     Arg:
     - chord: A tuple, such as ('C', 'maj')
@@ -61,7 +62,7 @@ def chord_to_onehot(chord: Tuple[str, str]) -> np.array:
     onehot[chord_to_id(chord)] = 1
     return onehot
 
-def onehot_to_chord(onehot: np.array) -> Tuple[str, str]:
+def onehot_to_chord(onehot: np.ndarray) -> Tuple[str, str]:
     ''' Convert a one-hot array to a chord.
     Arg:
     - onehot: A one-hot array. Order: [Cmaj, Cmin, C#maj, C#min, ...]
@@ -72,7 +73,7 @@ def onehot_to_chord(onehot: np.array) -> Tuple[str, str]:
     chord = id_to_chord(idx)
     return chord
 
-def chords_to_onehot_mat(chords: List[Tuple[str, str]]) -> np.array:
+def chords_to_onehot_mat(chords: List[Tuple[str, str]]) -> np.ndarray:
     ''' Convert chords to a series of one-hot arrays (a matrix)
     Arg:
     - chords: A sequence of chords
@@ -82,7 +83,7 @@ def chords_to_onehot_mat(chords: List[Tuple[str, str]]) -> np.array:
     onehot_mat = np.array(list(map(chord_to_onehot, chords)))
     return onehot_mat
 
-def onehot_mat_to_chords(onehot_mat: np.array) -> List[Tuple[str, str]]:
+def onehot_mat_to_chords(onehot_mat: np.ndarray) -> List[Tuple[str, str]]:
     ''' Convert a one-hot matrix to chords.
     Arg:
     - onehot_mat: A one-hot matrix
@@ -109,7 +110,7 @@ def transpose_chord_ids(chord_ids: List[int]) -> List[List[int]]:
         transposed_list.append([(x+N_TYPES*i) % (N_TYPES*12) for x in chord_ids])
     return transposed_list
 
-def transpose_onehot_mat(onehot_mat: np.array) -> List[np.array]:
+def transpose_onehot_mat(onehot_mat: np.ndarray) -> List[np.ndarray]:
     ''' Transpose a one-hot matrix (a chord sequence).
     Arg:
     - onehot_mat: A one-hot matrix
@@ -122,7 +123,7 @@ def transpose_onehot_mat(onehot_mat: np.array) -> List[np.array]:
     return transposed_mats
 
 # Evaluation functions
-def get_cross_entropy(predictions: np.array, ground_truths: np.array) -> float:
+def get_cross_entropy(predictions: np.ndarray, ground_truths: np.ndarray) -> float:
     ''' Calculate cross entropy
     Args:
     - predictions: A matrix, each row represents a sample.
@@ -136,3 +137,30 @@ def get_cross_entropy(predictions: np.array, ground_truths: np.array) -> float:
         cross_entropy_arr[i] = - np.sum(ground_truths * np.log(predictions))
     cross_entropy = np.mean(cross_entropy_arr)
     return cross_entropy
+
+def gen_batch(path: str, n_steps: int, batch_size: int, checking: bool = False) -> Iterator[Tuple[List[np.ndarray], Dict[str, List[np.ndarray]]]]:
+    parser = McGillParser()
+    while True:
+        X_batch = []
+        output_batch = []
+        for chords in parser.parse_directory(path):
+            if len(chords) < N_STEPS + 1:
+                continue
+            chord_ids = chords_to_ids(chords)
+            onehot_mat = chords_to_onehot_mat(chords)
+            transposed_onehot_mats = [onehot_mat] + transpose_onehot_mat(onehot_mat)
+            for i in range(len(chords) - N_STEPS):
+                for j in range(12):
+                    X_batch.append(transposed_onehot_mats[j][i:i+N_STEPS])
+                    output_batch.append(transposed_onehot_mats[j][i+1:i+N_STEPS+1])
+                    if len(X_batch) == batch_size:
+                        yield (
+                            np.array(X_batch),
+                            {
+                                'output': np.array(output_batch)
+                            }
+                        )
+                        X_batch = []
+                        output_batch = []
+        if checking:
+            break
