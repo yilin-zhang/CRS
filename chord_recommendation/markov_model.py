@@ -6,7 +6,7 @@ import pickle
 import numpy as np
 
 class MarkovModel():
-    def __init__(self, order=2):
+    def __init__(self, order:int=2):
         self._order = order
         self._freq_mat = np.ones((12*N_TYPES,)*(self._order+1),
                                  dtype=np.uint)
@@ -80,7 +80,7 @@ class MarkovModel():
         with open(path, 'wb') as f:
             pickle.dump(self.trans_prob_mat, f)
 
-    def load(self, path):
+    def load(self, path: str):
         ''' Load the transition probability matrix.
         Arg:
         - path: The path to the serialized file
