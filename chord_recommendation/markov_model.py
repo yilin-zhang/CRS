@@ -4,9 +4,10 @@ from typing import *
 import warnings
 import pickle
 import numpy as np
+from chord_recommendation.utils import *
 
 class MarkovModel():
-    def __init__(self, order:int=2):
+    def __init__(self, order: int=2):
         self._order = order
         self._freq_mat = np.ones((12*N_TYPES,)*(self._order+1),
                                  dtype=np.uint)
@@ -27,7 +28,9 @@ class MarkovModel():
         self._normalize()
         self._is_trained = True
 
-    def predict(self, seq: List[int]) -> np.float:
+    def predict_by_id(self, seq: List[int]) -> np.float:
+        if not self._is_trained:
+            raise Exception('The model has not been trained')
         seq_len = len(seq)
         if seq_len < self._order:
             raise ValueError(
@@ -35,6 +38,13 @@ class MarkovModel():
             )
         idx = tuple(seq[-(self._order):])
         return self.trans_prob_mat[idx]
+    
+    def predict(self, chords: List[Tuple[str, str]]) -> List[Tuple[str, str]]:
+        chord_seq = chords_to_ids(chords)
+        prediction = self.predict_by_id(chord_seq)
+        order = np.argsort(prediction)[::-1].tolist()
+        predicted_chords = list(map(id_to_chord, order))
+        return predicted_chords
 
     def clean(self):
         '''Clean up the model.'''
@@ -91,8 +101,7 @@ class MarkovModel():
             trans_prob_mat = pickle.load(f)
         new_order = len(trans_prob_mat.shape) - 1
         if new_order != self._order:
-            warnings.warn('The new order is: ' + str(new_order))
-            self._order = new_order
+            raise Exception('The order does not match')
         self.trans_prob_mat = trans_prob_mat
         self._is_trained = True
 
