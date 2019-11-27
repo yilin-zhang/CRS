@@ -1,4 +1,4 @@
-# Chord Detection and Prediction
+# Chord Detection and Recommendation
 
 ## Chord Detection
 Run `chroma_chord_detection.py`.
