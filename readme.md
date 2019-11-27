@@ -24,6 +24,6 @@ Run `chord_recommendation.py`.
 
 2. 
 
-# Chord Recommendation
+## Chord Recommendation
 
 1. 
