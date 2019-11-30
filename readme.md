@@ -30,4 +30,4 @@ Run `chord_recommendation.py` to get prediction and evaluation.
 
 ## Chord Recommendation
 
-1. 
+1. https://link.springer.com/article/10.1007/s11042-016-3984-z (Possibly, not completely sure. Just skimmed through it)
