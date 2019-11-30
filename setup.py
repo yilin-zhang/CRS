@@ -3,6 +3,7 @@ Set up the program, create necessary files.
 '''
 import os
 import sys
+import shutil
 
 from chord_recommendation.mcgill_parser import McGillParser
 from chord_recommendation.markov_model import MarkovModel
@@ -12,6 +13,9 @@ from chord_recommendation.utils import chords_to_ids, transpose_chord_ids, gen_b
 from config import *
 
 arg = sys.argv[1]
+
+if not os.path.exists(CACHE_PATH):
+    os.makedirs(CACHE_PATH)
 
 if arg == 'markov':
     # Train the Markov model, save the model to `cache` directory
@@ -24,9 +28,6 @@ if arg == 'markov':
             chord_ids = chords_to_ids(chords)
             chord_seqs = [chord_ids] + transpose_chord_ids(chord_ids)
             markov.feed_seqs(chord_seqs)
-
-    if not os.path.exists(CACHE_PATH):
-        os.makedirs(CACHE_PATH)
 
     markov.serialize(MARKOV_MODEL_PATH)
 
@@ -53,3 +54,6 @@ elif arg == 'rnn':
         CACHE_PATH,
         CACHE_PATH + 'log/'
     )
+
+elif arg == 'clean':
+    shutil.rmtree(CACHE_PATH)

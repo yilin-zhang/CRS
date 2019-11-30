@@ -8,16 +8,16 @@ Change the file name in main in function argument.
 
 ## Chord Recommendation
 
-The dataset we use is [McGill Billboard dataset](https://www.dropbox.com/s/2lvny9ves8kns4o/billboard-2.0-salami_chords.tar.gz?dl=1). After downloading it, create two directories `mcgill-train` and `mcgill-test` in the current project directory. Split the dataset manually, put all the training data into `mcgill-train`, all the testing data into `mcgill-test`.
+The dataset we use is [McGill Billboard dataset](https://www.dropbox.com/s/2lvny9ves8kns4o/billboard-2.0-salami_chords.tar.gz?dl=1). After downloading it, create two directories `mcgill-train/` and `mcgill-test/` in the current project directory. Split the dataset manually, put all the training data into `mcgill-train/`, all the testing data into `mcgill-test/`.
 
 The current chord prediction is using third-order Markov chain.
 You can adjust the order by changing the variable `MARKOV_ORDER` in `configs.py`.
 
-If this is the first time running the program, run `setup.py` first.
-
-Execute `python setup.py rnn` for training RNN model, `python setup.py markov` for training Markov chains.
+If this is the first time running the program, run `setup.py` first. The program will create trained machine learning model files. Execute `python setup.py rnn` for training RNN model, `python setup.py markov` for training Markov chains. The model files will be placed in `cache/` directory. Run `python setup.py clean` to remove the `cache/` directory.
 
 Run `chord_recommendation.py` to get prediction and evaluation.
+
+**For now the trained RNN model files are not properly named, so the program won't work unless you change the value of `RNN_MODEL_PATH` in `config.py` to the RNN model you are going to use.**
 
 # References
 
