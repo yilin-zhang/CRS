@@ -1,7 +1,9 @@
+from typing import *
+import numpy as np
 from tensorflow import keras
 from tensorflow.keras import layers
 from chord_recommendation.configs import *
-from chord_recommendation.utils import gen_batch
+from chord_recommendation.utils import *
 
 class RnnModel():
     def construct(self, dropout_rate: float):
@@ -80,3 +82,42 @@ class RnnModel():
             workers=2,
             use_multiprocessing=True,
             initial_epoch=initial_epoch)
+
+    def predict(self, chords: List[Tuple[str, str]]) -> Tuple[List[Tuple[str, str]], np.ndarray]:
+        '''
+        Arg:
+        - chords: A chord sequence/progression
+        Returns:
+        - sorted_chords: A chord sequence of all possible chords for the next
+          step, sorted by the probabilities
+        - probab: probability of each chord in sorted order
+        '''
+        onehot_mat = chords_to_onehot_mat(chords)
+        probab = self.predict_onehot_batch(np.array([onehot_mat]))
+        probab = probab[0] # fetch the first one, since the batch size is 1
+        ind_array = np.argsort(probab)[::-1]
+        probab = probab[ind_array]
+        sorted_chords = []
+        for i in range(len(ind_array)):
+            sorted_chords.append(id_to_chord(ind_array[i]))
+        return sorted_chords, probab
+
+    def predict_onehot_batch(self, onehot_mats: np.ndarray) -> np.ndarray:
+        '''
+        Arg:
+        - onehot_mats: An array with dimensions:
+          [batch_size, n_steps, onehot_len]
+        Return:
+        - probab: The probabilities of each chord
+        '''
+        batch_size = onehot_mats.shape[0]
+        prediction = self.model.predict(
+            onehot_mats,
+            batch_size=batch_size,
+            verbose=0
+        )
+        # Fetch all the outputs, but only the last step
+        # [[0.1, 0.2, 0.4, ...],
+        #  [0.3, 0.1, 0.2, ...]]
+        probab = prediction[:, -1]
+        return probab
