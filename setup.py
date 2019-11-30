@@ -10,7 +10,7 @@ from chord_recommendation.markov_model import MarkovModel
 from chord_recommendation.rnn_model import RnnModel
 from chord_recommendation.configs import *
 from chord_recommendation.utils import chords_to_ids, transpose_chord_ids, gen_batch
-from config import *
+from configs import *
 
 arg = sys.argv[1]
 

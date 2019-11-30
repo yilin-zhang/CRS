@@ -1,7 +1,7 @@
 from chord_recommendation.markov_model import MarkovModel
 from chord_recommendation.rnn_model import RnnModel
 from chord_recommendation.configs import MARKOV_ORDER, DROUPOUT_RATE
-from config import *
+from configs import *
 from evaluation import cross_entropy
 
 # Initialize

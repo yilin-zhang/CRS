@@ -17,7 +17,7 @@ If this is the first time running the program, run `setup.py` first. The program
 
 Run `chord_recommendation.py` to get prediction and evaluation.
 
-**For now the trained RNN model files are not properly named, so the program won't work unless you change the value of `RNN_MODEL_PATH` in `config.py` to the RNN model you are going to use.**
+**For now the trained RNN model files are not properly named, so the program won't work unless you change the value of `RNN_MODEL_PATH` in `configs.py` to the RNN model you are going to use.**
 
 # References
 
