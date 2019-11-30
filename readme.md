@@ -26,7 +26,8 @@ Run `chord_recommendation.py` to get prediction and evaluation.
 1. Automatic Chord Recognition from Audio Using Enhanced Pitch Class Profile, https://pdfs.semanticscholar.org/30a9/0af7c214f423743472e0c82f2b5332ccb55f.pdf
 
 
-2. 
+2. Realtime Chord Recognition of Musical Sound: a System Using Common Lisp Music,
+https://quod.lib.umich.edu/i/icmc/bbp2372.1999.446/1
 
 ## Chord Recommendation
 
