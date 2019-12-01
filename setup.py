@@ -22,6 +22,8 @@ if arg == 'markov':
     parser = McGillParser()
     markov = MarkovModel(order=MARKOV_ORDER)
     with markov.train_batch():
+        if not os.path.isdir(TRAIN_PATH):
+            raise Exception("Training data folder does not exist. Please make sure folder exists and has the correct name")
         for chords in parser.parse_directory(TRAIN_PATH):
             if len(chords) < MARKOV_ORDER + 1:
                 continue
