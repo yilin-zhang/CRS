@@ -7,7 +7,7 @@ def cross_entropy(markov: MarkovModel, path: str) -> float:
     parser = McGillParser()
     mean_cross_entropy = 0
     n_seqs = 0
-    for chords in parser.parse_directory('mcgill-test'):
+    for chords in parser.parse_directory(path):
         if len(chords) < MARKOV_ORDER + 1:
             continue
         chord_ids = chords_to_ids(chords)

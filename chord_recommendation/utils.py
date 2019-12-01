@@ -131,10 +131,13 @@ def get_cross_entropy(predictions: np.ndarray, ground_truths: np.ndarray) -> flo
     Return:
     - cross_entropy
     '''
-    n_samples = predictions.shape[0]
+    if len(predictions.shape) == 1:
+        n_samples = 1
+    else:
+        n_samples = predictions.shape[0]
     cross_entropy_arr = np.zeros(n_samples)
     for i in range(n_samples):
-        cross_entropy_arr[i] = - np.sum(ground_truths * np.log(predictions))
+        cross_entropy_arr[i] = - np.sum(ground_truths[i] * np.log(predictions[i]))
     cross_entropy = np.mean(cross_entropy_arr)
     return cross_entropy
 
