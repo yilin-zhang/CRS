@@ -39,13 +39,12 @@ class MarkovModel():
         idx = tuple(seq[-(self._order):])
         return self.trans_prob_mat[idx]
     
-    # TODO: Should also return probabilities of all chords
-    def predict(self, chords: List[Tuple[str, str]]) -> List[Tuple[str, str]]:
+    def predict(self, chords: List[Tuple[str, str]]) -> Tuple[List[Tuple[str, str]], np.ndarray]:
         chord_seq = chords_to_ids(chords)
         prediction = self.predict_by_id(chord_seq)
         order = np.argsort(prediction)[::-1].tolist()
         predicted_chords = list(map(id_to_chord, order))
-        return predicted_chords
+        return predicted_chords, prediction[order]
 
     def clean(self):
         '''Clean up the model.'''

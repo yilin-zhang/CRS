@@ -22,13 +22,13 @@ progression_2 = [('A', 'min'), ('F', 'maj'), ('C', 'maj')]
 progression_3 = [('C', 'maj'), ('G', 'maj'), ('A', 'min')]
 
 print('Markov prediction of the progression 1')
-print(markov.predict(progression_1))
+print(markov.predict(progression_1)[0])
 
 print('Markov prediction of the progression 2')
-print(markov.predict(progression_2))
+print(markov.predict(progression_2)[0])
 
 print('Markov prediction of the progression 3')
-print(markov.predict(progression_3))
+print(markov.predict(progression_3)[0])
 
 print('RNN prediction of the progression 1')
 print(rnn.predict(progression_1)[0])
