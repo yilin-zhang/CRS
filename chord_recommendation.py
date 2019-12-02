@@ -2,7 +2,7 @@ from chord_recommendation.markov_model import MarkovModel
 from chord_recommendation.rnn_model import RnnModel
 from chord_recommendation.configs import MARKOV_ORDER, DROUPOUT_RATE
 from configs import *
-from evaluation import cross_entropy
+from evaluation import *
 
 # Initialize
 markov = MarkovModel(MARKOV_ORDER)
@@ -11,7 +11,9 @@ rnn = RnnModel()
 rnn.load(RNN_MODEL_PATH, DROUPOUT_RATE)
 
 # Parse the testing set, and get the cross entropy
-ce = cross_entropy(markov, TEST_PATH)
+ce = cross_entropy_markov(markov, TEST_PATH)
+print(ce)
+ce = cross_entropy_rnn(rnn, TEST_PATH)
 print(ce)
 
 # Test the result

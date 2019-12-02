@@ -51,6 +51,14 @@ def chords_to_ids(chords: List[Tuple[str, str]]) -> List[int]:
     ids = list(map(chord_to_id, chords))
     return ids
 
+def ids_to_onehot_mat(ids: List[int]) -> np.ndarray:
+    onehot_mat = np.zeros((len(ids), N_TYPES*12))
+    for i in range(len(ids)):
+        onehot = np.zeros(N_TYPES*12)
+        onehot[ids[i]] = 1
+        onehot_mat[i] = onehot
+    return onehot_mat
+
 def chord_to_onehot(chord: Tuple[str, str]) -> np.ndarray:
     ''' Convert a chord to a one-hot array.
     Arg:
