@@ -1,8 +1,27 @@
+import numpy as np
 from chord_recommendation.markov_model import MarkovModel
 from chord_recommendation.rnn_model import RnnModel
 from chord_recommendation.mcgill_parser import McGillParser
-from chord_recommendation.configs import MARKOV_ORDER
+from chord_recommendation.configs import *
 from chord_recommendation.utils import *
+
+def get_cross_entropy(predictions: np.ndarray, ground_truths: np.ndarray) -> float:
+    ''' Calculate cross entropy
+    Args:
+    - predictions: A matrix, each row represents a sample.
+    - groundtruths: A matrix, each row is a one-hot array.
+    Return:
+    - cross_entropy
+    '''
+    if len(predictions.shape) == 1:
+        n_samples = 1
+    else:
+        n_samples = predictions.shape[0]
+    cross_entropy_arr = np.zeros(n_samples)
+    for i in range(n_samples):
+        cross_entropy_arr[i] = - np.sum(ground_truths[i] * np.log(predictions[i]))
+    cross_entropy = np.mean(cross_entropy_arr)
+    return cross_entropy
 
 def cross_entropy_markov(markov: MarkovModel, path: str) -> float:
     parser = McGillParser()

@@ -130,25 +130,6 @@ def transpose_onehot_mat(onehot_mat: np.ndarray) -> List[np.ndarray]:
         transposed_mats.append(np.roll(onehot_mat, N_TYPES*i, axis=1))
     return transposed_mats
 
-# Evaluation functions
-def get_cross_entropy(predictions: np.ndarray, ground_truths: np.ndarray) -> float:
-    ''' Calculate cross entropy
-    Args:
-    - predictions: A matrix, each row represents a sample.
-    - groundtruths: A matrix, each row is a one-hot array.
-    Return:
-    - cross_entropy
-    '''
-    if len(predictions.shape) == 1:
-        n_samples = 1
-    else:
-        n_samples = predictions.shape[0]
-    cross_entropy_arr = np.zeros(n_samples)
-    for i in range(n_samples):
-        cross_entropy_arr[i] = - np.sum(ground_truths[i] * np.log(predictions[i]))
-    cross_entropy = np.mean(cross_entropy_arr)
-    return cross_entropy
-
 def gen_batch(path: str, n_steps: int, batch_size: int, checking: bool = False) -> Iterator[Tuple[List[np.ndarray], Dict[str, List[np.ndarray]]]]:
     parser = McGillParser()
     while True:
