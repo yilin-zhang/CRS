@@ -21,8 +21,8 @@ chords = []
 
 markov = MarkovModel(MARKOV_ORDER)
 markov.load(MARKOV_MODEL_PATH)
-rnn = RnnModel()
-rnn.load(RNN_MODEL_PATH, DROUPOUT_RATE)
+#rnn = RnnModel()
+#rnn.load(RNN_MODEL_PATH, DROUPOUT_RATE)
 
 stream = AudioStream(temp_audio_path)
 stream.clean()
