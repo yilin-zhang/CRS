@@ -14,3 +14,5 @@
 /chord_detection/*.pyc
 /chord_recommendation/__pycache__
 /chord_recommendation/*.pyc
+/audio_stream/__pycache__
+/audio_stream/*.pyc
