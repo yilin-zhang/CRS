@@ -53,16 +53,16 @@ def chord_detection(filepath):
     # # 	print(timestamp[n],chords[id_chord[n]])
 
 
-    #Plotting all figures
-    # plt.figure(1)
-    # notes = ['G','G#','A','A#','B','C','C#','D','D#','E','F','F#']
-    # plt.xticks(np.arange(12),notes)
-    # plt.title('Pitch Class Profile')
-    # plt.xlabel('Note')
-    # plt.grid(True)
-    # plt.plot(chroma, notes)
-    # # plt.show()
-    #
+    # Plotting all figures
+    plt.figure(1)
+    notes = ['G','G#','A','A#','B','C','C#','D','D#','E','F','F#']
+    plt.xticks(np.arange(12),notes)
+    plt.title('Pitch Class Profile')
+    plt.xlabel('Note')
+    plt.grid(True)
+    plt.plot(chroma, notes)
+    plt.show()
+
     # plt.figure(2)
     # plt.yticks(np.arange(25), chords)
     # plt.plot(t, idx_chord)
@@ -72,8 +72,10 @@ def chord_detection(filepath):
     # plt.grid(True)
     # plt.show()
 
+    print(chord_name)
+
     return chord_name
 
 
 if __name__ == "__main__":
-    chord_detection("./Amaj.wav")
+    chord_detection("./test_chords/Grand Piano - Fazioli - minor .wav")
