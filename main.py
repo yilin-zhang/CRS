@@ -41,7 +41,7 @@ while True:
     stream.clean()
 
     if len(chords) == minimum_input:
-        prediction = rnn.predict(chords)
+        prediction = markov.predict(chords)
         print('Recommend:', [prediction[0][0], prediction[0][1], prediction[0][2]])
         chords = chords[1:]
 
