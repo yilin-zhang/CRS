@@ -1,4 +1,5 @@
 import json
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from chord_recognition.chromagram import extract_pitch_chroma
@@ -21,37 +22,16 @@ def chord_detection(filepath):
 
     chroma = extract_pitch_chroma(X, fs, 440)
 
-    nFrames = chroma.shape[1]
+    chroma_template = np.mean(chroma, axis=1)
 
-    # id_chord = np.zeros(nFrames, dtype='int32')
-    # timestamp = np.zeros(nFrames)
-    max_cor_in_frames = np.zeros(nFrames)
-    idx_max_cor_in_frames = np.zeros(nFrames)
+    """Correlate 12D chroma vector with each of 24 major and minor chords"""
+    cor_vec = np.zeros(24)
+    for idx in range(24):
+        cor_vec[idx] = np.dot(chroma_template, np.array(templates[idx]))
+    idx_max_cor = np.argmax(cor_vec)
 
-    for n in range(nFrames):
-        """Correlate 12D chroma vector with each of 24 major and minor chords"""
-        cor_vec = np.zeros(24)
-        for ni in range(24):
-            cor_vec[ni] = np.dot(chroma[:,n], np.array(templates[ni]))
-        max_cor_in_frames[n] =  np.max(cor_vec)
-        idx_max_cor_in_frames[n] = np.argmax(cor_vec)
-
-    max_corr = 0
-    id_max_corr = 0
-    for n in range(nFrames):
-        if max_corr < max_cor_in_frames[n]:
-            max_corr = max_cor_in_frames[n]
-            id_max_corr = idx_max_cor_in_frames[n]
-
-    idx_chord = int(id_max_corr + 1)
+    idx_chord = int(idx_max_cor + 1)
     chord_name = tuple(chords[idx_chord].split(" "))
-
-    # #if max_cor[n] < threshold, then no chord is played
-    # #might need to change threshold value
-    # id_chord[np.where(max_cor < 0.8*np.max(max_cor))] = 0
-    # # for n in range(nFrames):
-    # # 	print(timestamp[n],chords[id_chord[n]])
-
 
     # Plotting all figures
     #plt.figure(1)
@@ -72,10 +52,14 @@ def chord_detection(filepath):
     # plt.grid(True)
     # plt.show()
 
-    #print(chord_name)
+    print(chord_name)
 
     return chord_name
 
 
 if __name__ == "__main__":
-    chord_detection("./test_chords/Grand Piano - Fazioli - minor .wav")
+
+    for file in os.listdir("../../Project/chord-detection-prediction/test_chords"):
+        print(file)
+        if file.endswith(".wav"):
+            chord_detection("../../Project/chord-detection-prediction/test_chords/" + file)
