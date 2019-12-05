@@ -92,7 +92,7 @@ class RnnModel():
           step, sorted by the probabilities
         - probab: probability of each chord in sorted order
         '''
-        onehot_mat = chords_to_onehot_mat(chords)
+        onehot_mat = chords_to_onehot_mat(chords[-N_STEPS:])
         probab = self.predict_onehot_batch(np.array([onehot_mat]))
         probab = probab[0] # fetch the first one, since the batch size is 1
         ind_array = np.argsort(probab)[::-1]

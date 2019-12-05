@@ -74,7 +74,7 @@ class CliGui():
                 command = input(self.rec_prompt)
                 if command == 's':
                     stream.start()
-                    print('Start recording...')
+                    print('Recording...')
                     break
                 elif command == 'exit':
                     return
@@ -85,25 +85,47 @@ class CliGui():
                 command = input(self.rec_prompt)
                 if command == 's':
                     stream.stop()
-                    print('Stop recording...')
                     break
                 else:
                     continue
                 
             # Chord recognition
             chord = chord_detection(self.temp_audio_path)
-            print('You just played:', chord)
             chords.append(chord)
             stream.clean()
-
-            if len(chords) == self.minimum_input:
+            for ind, c in enumerate(chords):
+                chord_symbol = self._format_chord(c)
+                if (len(chords) - ind) <= self.minimum_input:
+                    print(colored(chord_symbol, color='green', attrs=['bold']), end='')
+                else:
+                    print(chord_symbol, end='')
+                if ind != len(chords) - 1:
+                    print(' -> ', end='')
+                else:
+                    print('\n')
+                
+            # Prediction/Recommendation
+            if len(chords) >= self.minimum_input:
+                prediction = [None, None, None]
                 if model == 'markov':
                     prediction = self.markov.predict(chords)[0]
-                    print('Recommend:', [prediction[0], prediction[1], prediction[2]])
                 elif model == 'rnn':
                     prediction = self.rnn.predict(chords)[0]
-                    print('Recommend:', [prediction[0], prediction[1], prediction[2]])
-                chords = chords[1:]
+                print('Maybe you want to try:')
+                for i in range(3):
+                    if i == 2:
+                        print(self._format_chord(prediction[i]))
+                    else:
+                        print(self._format_chord(prediction[i]), end=', ')
+                print('')
+                #chords = chords[1:]
+    
+    def _format_chord(self, chord):
+        if chord[1] == 'min':
+            chord_symbol = chord[0].lower()
+        else:
+            chord_symbol = chord[0]
+        return chord_symbol
 
     def _show_reording(self):
         print(self._get_volume_meter())

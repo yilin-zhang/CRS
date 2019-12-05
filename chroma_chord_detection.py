@@ -54,14 +54,14 @@ def chord_detection(filepath):
 
 
     # Plotting all figures
-    plt.figure(1)
-    notes = ['G','G#','A','A#','B','C','C#','D','D#','E','F','F#']
-    plt.xticks(np.arange(12),notes)
-    plt.title('Pitch Class Profile')
-    plt.xlabel('Note')
-    plt.grid(True)
-    plt.plot(chroma, notes)
-    plt.show()
+    #plt.figure(1)
+    #notes = ['G','G#','A','A#','B','C','C#','D','D#','E','F','F#']
+    #plt.xticks(np.arange(12),notes)
+    #plt.title('Pitch Class Profile')
+    #plt.xlabel('Note')
+    #plt.grid(True)
+    #plt.plot(chroma, notes)
+    #plt.show()
 
     # plt.figure(2)
     # plt.yticks(np.arange(25), chords)
@@ -72,7 +72,7 @@ def chord_detection(filepath):
     # plt.grid(True)
     # plt.show()
 
-    print(chord_name)
+    #print(chord_name)
 
     return chord_name
 
