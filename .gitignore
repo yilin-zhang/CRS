@@ -10,8 +10,8 @@
 /mcgill-train
 /mcgill-test
 # packages
-/chord_detection/__pycache__
-/chord_detection/*.pyc
+/chord_recognition/__pycache__
+/chord_recognition/*.pyc
 /chord_recommendation/__pycache__
 /chord_recommendation/*.pyc
 /audio_stream/__pycache__
