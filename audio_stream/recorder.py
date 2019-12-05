@@ -72,8 +72,8 @@ class RecordingFile(object):
         def callback(in_data, frame_count, time_info, status):
             self.wavefile.writeframes(in_data)
             # TODO: This variable should be used in GUI
-            global g_volume
-            g_volume = self._get_volume(in_data)
+            volume = self._get_volume(in_data)
+            self._visualize_volume(volume)
             return in_data, pyaudio.paContinue
         return callback
 
@@ -95,3 +95,18 @@ class RecordingFile(object):
         e = 0.0001
         volume = round(20 * math.log10((peak+e) / 2**16))
         return volume
+    
+    def _visualize_volume(self, volume):
+        if volume < -50:
+            bars = '[' + '-' * 50 + ']'
+        elif volume >= -18 and volume < -5:
+            bars = '[' + colored(' ' * (50 - 18), on_color='on_green') + colored(' ' * (18 + volume), on_color='on_yellow') + '-' * abs(volume) + ']'
+        elif volume >= -5:
+            bars = '[' + colored(' ' * (50 - 18), on_color='on_green') + colored(' ' * (18 - 5), on_color='on_yellow') + colored(' ' * (5+volume), on_color='on_red') + '-' * abs(volume) + ']'
+        else:
+            bars = '[' + colored(' ' * (50 + volume), on_color='on_green') + '-' * abs(volume) + ']'
+        if volume < -150:
+            num_str = '-∞'
+        else:
+            num_str = str(volume)
+        print(bars + num_str, end='\r')
