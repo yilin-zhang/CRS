@@ -53,26 +53,34 @@ def compute_stft(filepath):
 
         # compute magnitude spectrum
         X[:, n] = tmp[range(math.ceil(tmp.size / 2 + 1))]
-        X[[0, math.ceil(tmp.size / 2)], n] = X[[0, math.ceil(tmp.size / 2)], n] / np.sqrt(
-            2)  # let's be pedantic about normalization
+        X[[0, math.ceil(tmp.size / 2)], n] = X[[0, math.ceil(tmp.size / 2)], n] / np.sqrt(2)
 
     return X, fs, t
 
-def HPS(X, fs, order):
-    freqRange = int((len(X[0]) - 1) / order)
-    # print len(X)
-    # print X.shape
-    f0 = np.zeros((1, len(X)))
-    hps = np.zeros((len(X), freqRange))
-    freqSpread = np.linspace(0, fs / 2, len(X[0]))
-    for h in range(len(X)):
-        for i in range(freqRange):
-            multiplier = 1
-            for j in range(1, order + 1):
-                multiplier = multiplier * (X[h, i * j])
-            hps[h, i] = multiplier
-            if max(hps[h, :]) > 10 ** 10:
-                hps[h, :] = hps[h, :] / max(hps[h, :])
+
+def HPS(X, order):
+
+    num_blocks = X.shape[1]
+    total_bins = X.shape[0]
+    freqRange = int(np.ceil((total_bins) / (order)))
+    hps = np.ones((freqRange, num_blocks))
+
+    for i in np.arange(freqRange):
+        for n in np.arange(num_blocks):
+            count = 0
+            idx = i
+            while count < order:
+                if i == 0:
+                    hps[i,n] *= X[idx,n]
+                    idx += 1
+                    count += 1
+                else:
+                    hps[i,n] *= X[idx,n]
+                    idx = (2**order) * i
+                    count += 1
+                    if idx >= total_bins:
+                        break
+
     return hps
 
 def extract_pitch_chroma(X, fs, tfInHz, baseline_ver = 2):
@@ -80,9 +88,9 @@ def extract_pitch_chroma(X, fs, tfInHz, baseline_ver = 2):
     if baseline_ver == 1:
         Y = np.abs(X) ** 2
     elif baseline_ver == 2:
-        Y = HPS(X, fs, 2)
+        Y = HPS(X, 2)
     else:
-        Y = HPS(X, fs, 2)
+        Y = HPS(X, 2)
 
     # Need to calculate pitch chroma from C3 to B5 --> 48 to 83
     lower_bound = 48
