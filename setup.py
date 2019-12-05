@@ -12,12 +12,7 @@ from chord_recommendation.configs import *
 from chord_recommendation.utils import chords_to_ids, transpose_chord_ids, gen_batch
 from configs import *
 
-arg = sys.argv[1]
-
-if not os.path.exists(CACHE_PATH):
-    os.makedirs(CACHE_PATH)
-
-if arg == 'markov':
+def setup_markov():
     # Train the Markov model, save the model to `cache` directory
     parser = McGillParser()
     markov = MarkovModel(order=MARKOV_ORDER)
@@ -33,7 +28,7 @@ if arg == 'markov':
 
     markov.serialize(MARKOV_MODEL_PATH)
 
-elif arg == 'rnn':
+def setup_rnn():
     # Train the RNN model, save the model to `cache` directory
     steps_per_epoch = 0
     for _ in gen_batch(TRAIN_PATH, N_STEPS, BATCH_SIZE, True):
@@ -57,5 +52,18 @@ elif arg == 'rnn':
         CACHE_PATH + 'log/'
     )
 
-elif arg == 'clean':
+def clean_cache():
     shutil.rmtree(CACHE_PATH)
+
+if __name__ == '__main__':
+    arg = sys.argv[1]
+
+    if not os.path.exists(CACHE_PATH):
+        os.makedirs(CACHE_PATH)
+
+    if arg == 'markov':
+        setup_markov()
+    elif arg == 'rnn':
+        setup_rnn()
+    elif arg == 'clean':
+        clean_cache()
