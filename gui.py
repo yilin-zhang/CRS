@@ -36,7 +36,7 @@ class CliGui():
         print(crs_description)
         # The main loop
         while True:
-            command = input(self.prompt)
+            command = input(self.prompt).strip()
             if command == 'run rnn':
                 self.minimum_input = N_STEPS
                 self.rnn = RnnModel()
@@ -67,7 +67,7 @@ class CliGui():
         while True:
             # Record audio
             while True:
-                command = input(self.rec_prompt)
+                command = input(self.rec_prompt).strip()
                 # recording
                 if command == 'r':
                     stream.start()
