@@ -76,7 +76,7 @@ class CliGui():
                 # revert
                 elif command == 'v':
                     if len(chords) == 0:
-                        print('You should record at least 1 chord.\n')
+                        print('Please record at least 1 chord.\n')
                         continue
                     chords.pop()
                     print('Chain reverted:')
@@ -182,7 +182,7 @@ class CliGui():
             prediction = self.markov.predict(chords)[0]
         elif model == 'rnn':
             prediction = self.rnn.predict(chords)[0]
-        print('Maybe you want to try:')
+        print('Recommendation for next chord:')
         for i in range(3):
             if i == 2:
                 print(self._format_chord(prediction[i]))
