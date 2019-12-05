@@ -1,7 +1,5 @@
-import math
-import time
-import sys
-from termcolor import colored, cprint
+import re
+from termcolor import colored
 
 from setup import setup_markov, setup_rnn, clean_cache
 from audio_stream.audio_stream import AudioStream
@@ -56,13 +54,8 @@ class CliGui():
                 print('Goodbye!')
                 exit()
             else:
-                print("Command")
-                print("  run rnn       Use RNN for chord recommendation.")
-                print("  run markov    Use Markov chains for chord recommendation.")
-                print("  setup rnn     Create RNN model.")
-                print("  setup makrov  Create Markov model.")
-                print("  clean         Clean cache directory, remove model files.")
-                print("  exit          Exit the program.")
+                self._print_fisrt_level_help()
+                print('')
 
     def _run_recording(self, model):
         chords = []
@@ -72,60 +65,146 @@ class CliGui():
             # Record audio
             while True:
                 command = input(self.rec_prompt)
-                if command == 's':
+                # recording
+                if command == 'r':
                     stream.start()
-                    print('Recording...')
+                    print('Recording...\n')
                     break
+                # revert
+                elif command == 'v':
+                    if len(chords) == 0:
+                        print('You should record at least 1 chord.\n')
+                        continue
+                    chords.pop()
+                    print('Chain reverted:')
+                    self._print_chord_chain(chords)
+                    print('')
+                # recommend chords 
+                elif command == 'm':
+                    appended_chord = self._get_chord_from_command('m', command)
+                    if len(chords) < self.minimum_input:
+                        print('More chords required.\n')
+                        continue
+                    self._print_chord_recommend(chords, model)
+                    print('')
+                # exit
                 elif command == 'exit':
                     return
+                # fix the latest chord, (update chords[])
+                elif re.search(r'^f ', command):
+                    fixed_chord = self._get_chord_from_command('f', command)
+                    if not fixed_chord:
+                        print('Illegal chord name or type.\n')
+                        continue
+                    chords.pop()
+                    chords.append(fixed_chord)
+                    print('Chord fixed:')
+                    self._print_chord_chain(chords)
+                    print('')
+                # append a chord manually
+                elif re.search(r'^a ', command):
+                    appended_chord = self._get_chord_from_command('a', command)
+                    if not appended_chord:
+                        print('Illegal chord name or type.\n')
+                        continue
+                    chords.append(appended_chord)
+                    print('Chord appended:')
+                    self._print_chord_chain(chords)
+                    print('')
+                # print help
                 else:
+                    self._print_second_level_help()
+                    print('')
                     continue
             # Wait for stop
             while True:
                 command = input(self.rec_prompt)
-                if command == 's':
+                if command == 'r':
                     stream.stop()
                     break
                 else:
+                    print('Use command r to stop recording.')
                     continue
                 
             # Chord recognition
             chord = chord_detection(self.temp_audio_path)
             chords.append(chord)
             stream.clean()
-            for ind, c in enumerate(chords):
-                chord_symbol = self._format_chord(c)
-                if (len(chords) - ind) <= self.minimum_input:
-                    print(colored(chord_symbol, color='green', attrs=['bold']), end='')
-                else:
-                    print(chord_symbol, end='')
-                if ind != len(chords) - 1:
-                    print(' -> ', end='')
-                else:
-                    print('\n')
-                
-            # Prediction/Recommendation
+            # print chord chain
+            self._print_chord_chain(chords)
+            print('')
+            # Chord recommendation
             if len(chords) >= self.minimum_input:
-                prediction = [None, None, None]
-                if model == 'markov':
-                    prediction = self.markov.predict(chords)[0]
-                elif model == 'rnn':
-                    prediction = self.rnn.predict(chords)[0]
-                print('Maybe you want to try:')
-                for i in range(3):
-                    if i == 2:
-                        print(self._format_chord(prediction[i]))
-                    else:
-                        print(self._format_chord(prediction[i]), end=', ')
+                self._print_chord_recommend(chords, model) 
                 print('')
-                #chords = chords[1:]
-    
+
+    def _print_fisrt_level_help(self):
+        print("Command")
+        print("  run rnn       Use RNN for chord recommendation.")
+        print("  run markov    Use Markov chains for chord recommendation.")
+        print("  setup rnn     Create RNN model.")
+        print("  setup makrov  Create Markov model.")
+        print("  clean         Clean cache directory, remove model files.")
+        print("  exit          Exit the program.")
+
+    def _print_second_level_help(self):
+        print("Command")
+        print("  r             Record or stop.")
+        print("  v             Revert the chord chain.")
+        print("  m             Recommend chords based on the chord chain.")
+        print("  a             Manually append a chord to the chord chain.")
+        print("  f <new_chord> Fix the latest recognized chord.")
+        print("  exit          Exit the recommending mode.")
+
     def _format_chord(self, chord):
         if chord[1] == 'min':
             chord_symbol = chord[0].lower()
         else:
             chord_symbol = chord[0]
         return chord_symbol
+    
+    def _print_chord_chain(self, chords):
+        for ind, c in enumerate(chords):
+            chord_symbol = self._format_chord(c)
+            if (len(chords) - ind) <= self.minimum_input:
+                print(colored(chord_symbol, color='green', attrs=['bold']), end='')
+            else:
+                print(chord_symbol, end='')
+            if ind != len(chords) - 1:
+                print(' -> ', end='')
+            else:
+                print('')
+    
+    def _print_chord_recommend(self, chords, model):
+        # Prediction/Recommendation
+        prediction = [None, None, None]
+        if model == 'markov':
+            prediction = self.markov.predict(chords)[0]
+        elif model == 'rnn':
+            prediction = self.rnn.predict(chords)[0]
+        print('Maybe you want to try:')
+        for i in range(3):
+            if i == 2:
+                print(self._format_chord(prediction[i]))
+            else:
+                print(self._format_chord(prediction[i]), end=', ')
+    
+    def _get_chord_from_command(self, cmd_name, command):
+        cmd_match = re.search(r'^' + cmd_name + r' ([a-g]|[A-G])(#?)', command)
+        if cmd_match:
+            if cmd_match.group(1).isupper():
+                matched_chord = (
+                    cmd_match.group(1)+cmd_match.group(2),
+                    'maj'
+                )
+            else:
+                matched_chord = (
+                    cmd_match.group(1).upper()+cmd_match.group(2),
+                    'min'
+                )
+            return matched_chord
+        else:
+            return None
 
     def _show_reording(self):
         print(self._get_volume_meter())
