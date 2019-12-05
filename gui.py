@@ -1,4 +1,7 @@
 import re
+import keyboard
+import sys
+import termios
 from termcolor import colored
 
 from setup import setup_markov, setup_rnn, clean_cache
@@ -68,7 +71,7 @@ class CliGui():
                 # recording
                 if command == 'r':
                     stream.start()
-                    print('Recording...\n')
+                    print('Recording... Press <space> to stop.')
                     break
                 # revert
                 elif command == 'v':
@@ -116,15 +119,12 @@ class CliGui():
                     self._print_second_level_help()
                     print('')
                     continue
-            # Wait for stop
-            while True:
-                command = input(self.rec_prompt)
-                if command == 'r':
-                    stream.stop()
-                    break
-                else:
-                    print('Use command r to stop recording.')
-                    continue
+            
+            # Recording, waiting for stop
+            keyboard.wait('space')
+            stream.stop()
+            print(' ' * 55)
+            termios.tcflush(sys.stdin, termios.TCIFLUSH) # flush input buffer
                 
             # Chord recognition
             chord = chord_detection(self.temp_audio_path)
@@ -149,7 +149,7 @@ class CliGui():
 
     def _print_second_level_help(self):
         print("Command")
-        print("  r             Record or stop.")
+        print("  r             Record.")
         print("  v             Revert the chord chain.")
         print("  m             Recommend chords based on the chord chain.")
         print("  a             Manually append a chord to the chord chain.")
@@ -205,25 +205,3 @@ class CliGui():
             return matched_chord
         else:
             return None
-
-    def _show_reording(self):
-        print(self._get_volume_meter())
-        pass
-
-    def _update_volume(self, volume):
-        self.volume = volume
-
-    def _get_volume_meter(self):
-        if self.volume < -50:
-            bars = '[' + '-' * 50 + ']'
-        elif self.volume >= -18 and self.volume < -5:
-            bars = '[' + colored(' ' * (50 - 18), on_color='on_green') + colored(' ' * (18 + self.volume), on_color='on_yellow') + '-' * abs(self.volume) + ']'
-        elif self.volume >= -5:
-            bars = '[' + colored(' ' * (50 - 18), on_color='on_green') + colored(' ' * (18 - 5), on_color='on_yellow') + colored(' ' * (5+self.volume), on_color='on_red') + '-' * abs(self.volume) + ']'
-        else:
-            bars = '[' + colored(' ' * (50 + self.volume), on_color='on_green') + '-' * abs(self.volume) + ']'
-        if self.volume < -150:
-            num_str = '-∞'
-        else:
-            num_str = str(self.volume)
-        return bars + ' ' + num_str
