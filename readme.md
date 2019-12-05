@@ -1,4 +1,4 @@
-# Chord Detection and Recommendation
+# Chord Recommendation System
 
 ## Preparation
 The only thing that should be set up first is the machine-learning-based chord recommendation.
