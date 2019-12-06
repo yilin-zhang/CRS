@@ -75,6 +75,7 @@ def most_frequent(List):
 	occurence_count = Counter(List) 
 	return occurence_count.most_common(1)[0][0] 
 
+model = load_model('chord_recognition/gnb_mine.pkl')
 def chord_recognition(wav_file_path):
     df = pd.read_csv('chord_recognition/data - Copy.csv')
     df = pd.DataFrame(df)
@@ -82,7 +83,7 @@ def chord_recognition(wav_file_path):
     from sklearn import preprocessing
     le = preprocessing.LabelEncoder()
     label_encoded = le.fit_transform(label)
-    model = load_model('chord_recognition/gnb_mine.pkl')
+    #model = load_model('chord_recognition/gnb_mine.pkl')
     wave_peak, result = realtime_recognition(model, le, wav_file_path)
     final_result = []
     j = len(result) / len(wave_peak)

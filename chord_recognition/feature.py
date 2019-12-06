@@ -73,7 +73,7 @@ def chromagram(wave, sr, wave_peak, block_length=512, slice_len=1024*8, show=Tru
             chromagrams.append(np.sum(PCP[:,j:j+nsum],axis=1))
         real_peak.append(peak)
         i+=1
-        print('PCP of slice {} finished'.format(i))
+        #print('PCP of slice {} finished'.format(i))
 
     if show:
         fig = plt.figure()

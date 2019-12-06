@@ -14,7 +14,7 @@ class Recorder(object):
         self.rate = rate
         self.frames_per_buffer = frames_per_buffer
 
-    def open(self, fname, input_device_index=None, mode='wb'):
+    def open(self, fname, input_device_index=0, mode='wb'):
         return RecordingFile(fname, mode, self.channels, self.rate,
                             input_device_index, self.frames_per_buffer)
 
@@ -56,7 +56,7 @@ class RecordingFile(object):
                                         channels=self.channels,
                                         rate=self.rate,
                                         input=True,
-                                        #output=True,
+                                        output=True,
                                         input_device_index = self.input_device_index,
                                         frames_per_buffer=self.frames_per_buffer,
                                         stream_callback=self.get_callback())
