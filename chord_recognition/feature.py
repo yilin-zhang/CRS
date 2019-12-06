@@ -46,7 +46,7 @@ def onset_detection(wave, sr, block_length=512, show=False):
     return wave_peak
 
 
-def chromagram(wave, sr, wave_peak, block_length=512, slice_len=1024*8, show=False):
+def chromagram(wave, sr, wave_peak, block_length=512, slice_len=1024*8, show=True):
     #############################################
     # Step 2: chromagram
     #############################################
@@ -61,7 +61,7 @@ def chromagram(wave, sr, wave_peak, block_length=512, slice_len=1024*8, show=Fal
     slice_matrix = np.zeros((len(wave[wave_peak[0]+offset_index:wave_peak[0]+offset_index+slice_len]), len(wave_peak)))
     for peak in wave_peak:
         slice = wave[peak+offset_index:peak+offset_index+slice_len]
-        slice_matrix[:,i] = slice
+        # slice_matrix[:,i] = slice
         if len(slice) < slice_len:
             continue
         slice_rms = np.sqrt(np.mean(np.square(slice)))
@@ -79,7 +79,7 @@ def chromagram(wave, sr, wave_peak, block_length=512, slice_len=1024*8, show=Fal
         fig = plt.figure()
         ax = fig.add_subplot(311)
         ax.plot(wave)
-        bx = fig.add_subplot(312)
+        bx = fig.add_subplot(312)   
         bx.plot([1 if i in real_peak else 0 for i in range(len(wave))])
         cx = fig.add_subplot(313)
         cx.bar(range(12), chromagrams[1])
@@ -88,7 +88,7 @@ def chromagram(wave, sr, wave_peak, block_length=512, slice_len=1024*8, show=Fal
         print('Number of PCPs: {}'.format(np.array(chromagrams).shape))
         plt.show()
 
-    return slice_matrix, chromagrams
+    return chromagrams
 
 
 def calculate_PCP(wave, sr, fft_len=2048, show=False):
@@ -108,10 +108,12 @@ def calculate_PCP(wave, sr, fft_len=2048, show=False):
 def extract_feature(data_dir):
     # data = [] # element: tuple (label, feature)
     data = pd.DataFrame(columns=['label','C ','C#','D ','D#','E ','F ','F#','G ','G#','A ','A#','B '])
-    dir = './chord audio/*.wav'
+    # dir = './chord audio/*.wav'
+    dir = 'C:/Users/bhxxl/Desktop/Project - Copy - Copy/single-chord-dataset 2/single-chord-dataset/Gm/*.wav'
     file_list = glob.glob(dir)
     for file in file_list:
-        label = os.path.split(file)[1].split('.wav')[0]
+        # label = os.path.split(file)[1].split('.wav')[0]
+        label = 'Gm'
         print('Extracting: {}'.format(label))
         wave, sr= lb.load(file, sr=44100)
         wave_peak = onset_detection(wave, sr, show=False)
@@ -135,4 +137,4 @@ def extract_feature(data_dir):
 
 
 if __name__ == "__main__":
-    extract_feature('./data.csv')
+    extract_feature('./dataGm.csv')

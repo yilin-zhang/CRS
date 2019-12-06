@@ -6,7 +6,8 @@ from time import perf_counter
 ############################ KNN ######################################
 # Read in data
 import pandas as pd
-df = pd.read_csv('./data/data.csv')
+df = pd.read_csv('./data/data - Copy.csv')
+# df = pd.read_csv('chroma_1.csv')
 df = pd.DataFrame(df)
 # print(df)
 label = list(df['label'])
@@ -118,4 +119,4 @@ print("SVM Time used:",elapsed)
 from sklearn import metrics
 # Model Accuracy: how often is the classifier correct?
 print("SVM Accuracy:",metrics.accuracy_score(y_test, y_pred))
-joblib.dump(clf, "clf_train_model.m")
+# joblib.dump(clf, "clf_train_model.m")
