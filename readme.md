@@ -11,7 +11,7 @@ If this is the first time running the program, run `setup.py` first. The program
 **For now the trained RNN model files are not properly named, so the program won't work unless you change the value of `RNN_MODEL_PATH` in `configs.py` to the RNN model you are going to use.**
 
 ## Running
-Run `main.py`, which is the entrance to the whole program.
+Run `main.py`, which is the entrance to the whole program. The system is using 5 as step size for chord recommendation. Onset detection is disabled by default.
 
 ## Testing and Evaluation
 ### Chord Detection

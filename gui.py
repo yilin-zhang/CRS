@@ -126,10 +126,10 @@ class CliGui():
             termios.tcflush(sys.stdin, termios.TCIFLUSH) # flush input buffer
                 
             # Chord recognition
-            chord_sequence = chord_recognition(self.temp_audio_path)
-            #chord_sequence = chord_detection_improved(self.temp_audio_path)
-            #chords.append(chord)
-            chords += chord_sequence
+            #chord_sequence = chord_recognition(self.temp_audio_path)
+            chord = chord_detection_improved(self.temp_audio_path)
+            chords.append(chord)
+            #chords += chord_sequence
             stream.clean()
             # print chord chain
             self._print_chord_chain(chords)

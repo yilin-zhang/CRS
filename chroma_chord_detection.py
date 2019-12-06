@@ -50,7 +50,8 @@ def chord_detection_baseline(filepath):
 
     X, fs = compute_stft(xb, fs, block_size, hop_size)
 
-    chroma = extract_pitch_chroma(X, fs, reference_frequency)
+    chroma = extract_pitch_chroma(X, fs, reference_frequency, 1)
+
 
     chroma_template = np.mean(chroma, axis=1)
 
@@ -74,46 +75,51 @@ def chord_detection_baseline(filepath):
     # plt.plot(notes, chroma_template)
     # plt.show()
 
-    # plt.figure(2)
-    # plt.yticks(np.arange(25), chords)
-    # plt.plot(t, idx_chord)
-    # plt.xlabel('Time in seconds')
-    # plt.ylabel('Chords')
-    # plt.title('Identified chords')
-    # plt.grid(True)
-    # plt.show()
-
-    print(chroma_template)
-
     return chord_name
 
 def chord_detection_improved(filepath):
 
-    x, fs = lb.load(filepath, sr=None)
-    wave_peak = onset_detection(x, fs)
-    xb, _ = chromagram(x, fs, wave_peak)
-    print(xb)
-    xb = xb.T
+    for chord in chords:
+        if chord is 'N':
+            continue
+        templates.append(templates_json[chord])
+
+    fs, x = file_read(filepath)
+
+    if len(x.shape) > 1:
+        x = x[:,1]
+
+    xb, t = block_audio(x, block_size, hop_size, fs)
 
     X, fs = compute_stft(xb, fs, block_size, hop_size)
 
-    chroma = extract_pitch_chroma(X, fs, reference_frequency)
-
-    chroma = chroma.T
-
-    #print(chroma)
+    chroma = extract_pitch_chroma(X, fs, reference_frequency, 1)
 
 
-    chord_name = le.inverse_transform(model.predict(chroma))
+    chroma_template = np.mean(chroma, axis=1)
 
-    chord_label = []
-    for chord in chord_name:
-        tmp = tuple(chord.split(" "))
-        chord_label.append(tmp)
+    """Correlate 12D chroma vector with each of 24 major and minor chords"""
+    cor_vec = np.zeros(24)
+    for idx in range(24):
+        cor_vec[idx] = np.dot(chroma_template, np.array(templates[idx]))
+    idx_max_cor = np.argmax(cor_vec)
 
-    #print(chord_label)
+    idx_chord = int(idx_max_cor + 1)
+    chord_name = tuple(chords[idx_chord].split(" "))
 
-    return chord_label
+    ## Plotting all figures
+    # plt.figure(1)
+    # notes = ['G','G#','A','A#','B','C','C#','D','D#','E','F','F#']
+    # plt.xticks(np.arange(12),notes)
+    # plt.title('Pitch Class Profile')
+    # plt.xlabel('Notes')
+    # plt.ylim((0.0,1.0))
+    # plt.grid(True)
+    # plt.plot(notes, chroma_template)
+    # plt.show()
+
+    return chord_name
+
 
 if __name__ == "__main__":
     count = 0
