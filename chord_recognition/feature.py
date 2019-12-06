@@ -88,7 +88,7 @@ def chromagram(wave, sr, wave_peak, block_length=512, slice_len=1024*8, show=Tru
         print('Number of PCPs: {}'.format(np.array(chromagrams).shape))
         plt.show()
 
-    return chromagrams
+    return slice_matrix, chromagrams
 
 
 def calculate_PCP(wave, sr, fft_len=2048, show=False):

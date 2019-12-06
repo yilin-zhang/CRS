@@ -26,12 +26,12 @@ def load_model(model_path):
 
     return model
 
-df = pd.read_csv('./data.csv')
+df = pd.read_csv('./chord_recognition/data - Copy.csv')
 df = pd.DataFrame(df)
 label = list(df['label'])
 le = preprocessing.LabelEncoder()
 label_encoded = le.fit_transform(label)
-model = load_model('./gnb_mine.pkl')
+model = load_model('./chord_recognition/gnb_mine.pkl')
 
 
 def chord_detection_baseline(filepath):
@@ -103,12 +103,19 @@ def chord_detection_improved(filepath):
 
     chord_name = le.inverse_transform(model.predict(chroma))
 
-    print(chord_name)
+    chord_label = []
+    for chord in chord_name:
+        tmp = tuple(chord.split(" "))
+        chord_label.append(tmp)
+
+    print(chord_label)
 
     return chord_name
 
 if __name__ == "__main__":
-    for file in os.listdir("../../Project/chord-detection-prediction/test_chords"):
-        print(file)
-        if file.endswith(".wav"):
-            chord_detection_improved("../../Project/chord-detection-prediction/test_chords/" + file)
+    for dir in os.listdir("./single-chord-dataset/"):
+        if dir != ".DS_Store":
+            for file in os.listdir("./single-chord-dataset/" + str(dir)):
+                if file != ".DS_Store":
+                    chord = chord_detection_improved("./single-chord-dataset/" + str(dir) + "/" + str(file))
+                    # print("Estimated: " + str(chord) + "    |    " + "Ground Truth: " + str(dir))
