@@ -15,8 +15,8 @@ with open('chord_recognition/chord_templates.json', 'r') as fp:
 chords = ['N','G maj','G# maj','A maj','A# maj','B maj','C maj','C# maj','D maj','D# maj','E maj','F maj','F# maj','G min','G# min','A min','A# min','B min','C min','C# min','D min','D# min','E min','F min','F# min']
 templates = []
 
-block_size = 4096
-hop_size = 256
+block_size = 8192
+hop_size = 1024
 
 reference_frequency = 440
 
@@ -63,15 +63,16 @@ def chord_detection_baseline(filepath):
     idx_chord = int(idx_max_cor + 1)
     chord_name = tuple(chords[idx_chord].split(" "))
 
-    # Plotting all figures
-    #plt.figure(1)
-    #notes = ['G','G#','A','A#','B','C','C#','D','D#','E','F','F#']
-    #plt.xticks(np.arange(12),notes)
-    #plt.title('Pitch Class Profile')
-    #plt.xlabel('Note')
-    #plt.grid(True)
-    #plt.plot(chroma, notes)
-    #plt.show()
+    ## Plotting all figures
+    # plt.figure(1)
+    # notes = ['G','G#','A','A#','B','C','C#','D','D#','E','F','F#']
+    # plt.xticks(np.arange(12),notes)
+    # plt.title('Pitch Class Profile')
+    # plt.xlabel('Notes')
+    # plt.ylim((0.0,1.0))
+    # plt.grid(True)
+    # plt.plot(notes, chroma_template)
+    # plt.show()
 
     # plt.figure(2)
     # plt.yticks(np.arange(25), chords)
@@ -82,7 +83,7 @@ def chord_detection_baseline(filepath):
     # plt.grid(True)
     # plt.show()
 
-    print(chord_name)
+    print(chroma_template)
 
     return chord_name
 
@@ -91,6 +92,7 @@ def chord_detection_improved(filepath):
     x, fs = lb.load(filepath, sr=None)
     wave_peak = onset_detection(x, fs)
     xb, _ = chromagram(x, fs, wave_peak)
+    print(xb)
     xb = xb.T
 
     X, fs = compute_stft(xb, fs, block_size, hop_size)
@@ -100,6 +102,7 @@ def chord_detection_improved(filepath):
     chroma = chroma.T
 
     #print(chroma)
+
 
     chord_name = le.inverse_transform(model.predict(chroma))
 
@@ -113,9 +116,18 @@ def chord_detection_improved(filepath):
     return chord_label
 
 if __name__ == "__main__":
-    for dir in os.listdir("./single-chord-dataset/"):
-        if dir != ".DS_Store":
-            for file in os.listdir("./single-chord-dataset/" + str(dir)):
-                if file != ".DS_Store":
-                    chord = chord_detection_improved("./single-chord-dataset/" + str(dir) + "/" + str(file))
-                    # print("Estimated: " + str(chord) + "    |    " + "Ground Truth: " + str(dir))
+    count = 0
+    # for dir in os.listdir("./single-chord-dataset/"):
+    #     if dir != ".DS_Store":
+    #         for file in os.listdir("./single-chord-dataset/" + str(dir)):
+    #             if file != ".DS_Store":
+    #                 chord = chord_detection_baseline("./single-chord-dataset/" + str(dir) + "/" + str(file))
+    #                 print("Estimated: " + str(chord) + "    |    " + "Ground Truth: " + str(dir))
+    #                 est = str(chord[0]) + " " + str(chord[1])
+    #                 gt = str(dir)
+    #                 if est == gt:
+    #                     count += 1
+    #
+    # print(count)
+
+    # chord_detection_baseline("./single-chord-dataset/G maj/Grand Piano - Fazioli - major G middle.wav")
