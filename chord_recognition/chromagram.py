@@ -5,9 +5,9 @@ import scipy as sp
 from scipy.io.wavfile import read
 
 
-block_size = 4096
-hop_size = 256
-
+def file_read(filepath):
+    fs, x = read(filepath)
+    return fs, x
 
 def block_audio(x, blockSize, hopSize, fs):
     """
@@ -35,15 +35,10 @@ def compute_hann(iWindowLength):
     return 0.5 - (0.5 * np.cos(2 * np.pi / iWindowLength * np.arange(iWindowLength)))
 
 
-def compute_stft(filepath):
-    fs, x = read(filepath)
-
-    if len(x.shape) > 1:
-        x = x[:,1]
-
-    xb, t = block_audio(x, block_size, hop_size, fs)
+def compute_stft(xb, fs, block_size, hop_size):
 
     numBlocks = xb.shape[0]
+    print(numBlocks)
     afWindow = compute_hann(xb.shape[1])
     X = np.zeros([math.ceil(xb.shape[1] / 2 + 1), numBlocks])
 
@@ -55,7 +50,7 @@ def compute_stft(filepath):
         X[:, n] = tmp[range(math.ceil(tmp.size / 2 + 1))]
         X[[0, math.ceil(tmp.size / 2)], n] = X[[0, math.ceil(tmp.size / 2)], n] / np.sqrt(2)
 
-    return X, fs, t
+    return X, fs
 
 
 def HPS(X, order):

@@ -1,9 +1,13 @@
 import json
 import os
 import numpy as np
+import librosa as lb
+import pandas as pd
 import matplotlib.pyplot as plt
-from chord_recognition.chromagram import extract_pitch_chroma
-from chord_recognition.chromagram import compute_stft
+from sklearn.externals import joblib
+from sklearn import preprocessing
+from chord_recognition.chromagram import extract_pitch_chroma, compute_stft, file_read, block_audio
+from chord_recognition.feature import chromagram, onset_detection
 
 with open('chord_recognition/chord_templates.json', 'r') as fp:
     templates_json = json.load(fp)
@@ -11,16 +15,42 @@ with open('chord_recognition/chord_templates.json', 'r') as fp:
 chords = ['N','G maj','G# maj','A maj','A# maj','B maj','C maj','C# maj','D maj','D# maj','E maj','F maj','F# maj','G min','G# min','A min','A# min','B min','C min','C# min','D min','D# min','E min','F min','F# min']
 templates = []
 
-def chord_detection(filepath):
+block_size = 4096
+hop_size = 256
+
+reference_frequency = 440
+
+def load_model(model_path):
+    print('loading_model...')
+    model = joblib.load(model_path)
+
+    return model
+
+df = pd.read_csv('./data.csv')
+df = pd.DataFrame(df)
+label = list(df['label'])
+le = preprocessing.LabelEncoder()
+label_encoded = le.fit_transform(label)
+model = load_model('./gnb_mine.pkl')
+
+
+def chord_detection_baseline(filepath):
 
     for chord in chords:
         if chord is 'N':
             continue
         templates.append(templates_json[chord])
 
-    X, fs, t = compute_stft(filepath)
+    fs, x = file_read(filepath)
 
-    chroma = extract_pitch_chroma(X, fs, 440)
+    if len(x.shape) > 1:
+        x = x[:,1]
+
+    xb, t = block_audio(x, block_size, hop_size, fs)
+
+    X, fs = compute_stft(xb, fs, block_size, hop_size)
+
+    chroma = extract_pitch_chroma(X, fs, reference_frequency)
 
     chroma_template = np.mean(chroma, axis=1)
 
@@ -56,10 +86,29 @@ def chord_detection(filepath):
 
     return chord_name
 
+def chord_detection_improved(filepath):
+
+    x, fs = lb.load(filepath, sr=None)
+    wave_peak = onset_detection(x, fs)
+    xb, _ = chromagram(x, fs, wave_peak)
+    xb = xb.T
+
+    X, fs = compute_stft(xb, fs, block_size, hop_size)
+
+    chroma = extract_pitch_chroma(X, fs, reference_frequency)
+
+    chroma = chroma.T
+
+    print(chroma)
+
+    chord_name = le.inverse_transform(model.predict(chroma))
+
+    print(chord_name)
+
+    return chord_name
 
 if __name__ == "__main__":
-
     for file in os.listdir("../../Project/chord-detection-prediction/test_chords"):
         print(file)
         if file.endswith(".wav"):
-            chord_detection("../../Project/chord-detection-prediction/test_chords/" + file)
+            chord_detection_improved("../../Project/chord-detection-prediction/test_chords/" + file)

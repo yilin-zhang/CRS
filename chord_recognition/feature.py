@@ -46,7 +46,7 @@ def onset_detection(wave, sr, block_length=512, show=False):
     return wave_peak
 
 
-def chromagram(wave, sr, wave_peak, block_length=512, slice_len=1024*8, show=True):
+def chromagram(wave, sr, wave_peak, block_length=512, slice_len=1024*8, show=False):
     #############################################
     # Step 2: chromagram
     #############################################
@@ -79,7 +79,7 @@ def chromagram(wave, sr, wave_peak, block_length=512, slice_len=1024*8, show=Tru
         fig = plt.figure()
         ax = fig.add_subplot(311)
         ax.plot(wave)
-        bx = fig.add_subplot(312)   
+        bx = fig.add_subplot(312)
         bx.plot([1 if i in real_peak else 0 for i in range(len(wave))])
         cx = fig.add_subplot(313)
         cx.bar(range(12), chromagrams[1])
@@ -88,7 +88,7 @@ def chromagram(wave, sr, wave_peak, block_length=512, slice_len=1024*8, show=Tru
         print('Number of PCPs: {}'.format(np.array(chromagrams).shape))
         plt.show()
 
-    return chromagrams
+    return slice_matrix, chromagrams
 
 
 def calculate_PCP(wave, sr, fft_len=2048, show=False):
