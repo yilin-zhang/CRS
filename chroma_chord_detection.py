@@ -99,7 +99,7 @@ def chord_detection_improved(filepath):
 
     chroma = chroma.T
 
-    print(chroma)
+    #print(chroma)
 
     chord_name = le.inverse_transform(model.predict(chroma))
 
@@ -108,9 +108,9 @@ def chord_detection_improved(filepath):
         tmp = tuple(chord.split(" "))
         chord_label.append(tmp)
 
-    print(chord_label)
+    #print(chord_label)
 
-    return chord_name
+    return chord_label
 
 if __name__ == "__main__":
     for dir in os.listdir("./single-chord-dataset/"):

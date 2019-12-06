@@ -42,7 +42,7 @@ def realtime_recognition(model, le, wav_file_path):
     # plt.plot(data)
     
     wave_peak = feature.onset_detection(data, sr, show=False)
-    PCP = feature.chromagram(data,sr,wave_peak,show=False)
+    _, PCP = feature.chromagram(data,sr,wave_peak,show=False)
     PCP = np.array(PCP)
     # data_rms = np.sqrt(np.mean(np.square(data)))
     # print(data_rms)

@@ -14,6 +14,7 @@ from chord_recommendation.markov_model import MarkovModel
 from chord_recommendation.rnn_model import RnnModel
 
 from chord_recognition.chord_recog import chord_recognition
+from chroma_chord_detection import chord_detection_improved
 
 class CliGui():
     def __init__(self):
@@ -121,11 +122,12 @@ class CliGui():
             # Recording, waiting for stop
             keyboard.wait('space')
             stream.stop()
-            print(' ' * 55)
+            print(' ' * 56)
             termios.tcflush(sys.stdin, termios.TCIFLUSH) # flush input buffer
                 
             # Chord recognition
             chord_sequence = chord_recognition(self.temp_audio_path)
+            #chord_sequence = chord_detection_improved(self.temp_audio_path)
             #chords.append(chord)
             chords += chord_sequence
             stream.clean()
