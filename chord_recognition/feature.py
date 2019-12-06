@@ -61,7 +61,7 @@ def chromagram(wave, sr, wave_peak, block_length=512, slice_len=1024*8, show=Tru
     slice_matrix = np.zeros((len(wave[wave_peak[0]+offset_index:wave_peak[0]+offset_index+slice_len]), len(wave_peak)))
     for peak in wave_peak:
         slice = wave[peak+offset_index:peak+offset_index+slice_len]
-        # slice_matrix[:,i] = slice
+        slice_matrix[:,i] = slice
         if len(slice) < slice_len:
             continue
         slice_rms = np.sqrt(np.mean(np.square(slice)))

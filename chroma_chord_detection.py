@@ -117,17 +117,17 @@ def chord_detection_improved(filepath):
 
 if __name__ == "__main__":
     count = 0
-    # for dir in os.listdir("./single-chord-dataset/"):
-    #     if dir != ".DS_Store":
-    #         for file in os.listdir("./single-chord-dataset/" + str(dir)):
-    #             if file != ".DS_Store":
-    #                 chord = chord_detection_baseline("./single-chord-dataset/" + str(dir) + "/" + str(file))
-    #                 print("Estimated: " + str(chord) + "    |    " + "Ground Truth: " + str(dir))
-    #                 est = str(chord[0]) + " " + str(chord[1])
-    #                 gt = str(dir)
-    #                 if est == gt:
-    #                     count += 1
-    #
-    # print(count)
+    for dir in os.listdir("./single-chord-dataset/"):
+        if dir != ".DS_Store":
+            for file in os.listdir("./single-chord-dataset/" + str(dir)):
+                if file != ".DS_Store":
+                    chord = chord_detection_baseline("./single-chord-dataset/" + str(dir) + "/" + str(file))
+                    print("Estimated: " + str(chord) + "    |    " + "Ground Truth: " + str(dir))
+                    est = str(chord[0]) + " " + str(chord[1])
+                    gt = str(dir)
+                    if est == gt:
+                        count += 1
+    
+    print(count)
 
     # chord_detection_baseline("./single-chord-dataset/G maj/Grand Piano - Fazioli - major G middle.wav")
