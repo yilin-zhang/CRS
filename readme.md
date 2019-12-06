@@ -6,7 +6,7 @@ The only thing that should be set up first is the machine-learning-based chord r
 The current chord prediction is using third-order Markov chain.
 You can adjust the order by changing the variable `MARKOV_ORDER` in `configs.py`.
 
-If this is the first time running the program, run `setup.py` first. The program will automatically download and split the McGill Billboard dataset, and create trained machine learning model files. Execute `python setup.py rnn` for training RNN model, `python setup.py markov` for training Markov chains. The model files will be placed in `cache/` directory. Run `python setup.py clean` to remove the `cache/` directory.
+**If this is the first time running the program, `setup.py` should be executed first.** The program will automatically download and split the McGill Billboard dataset, and create trained machine learning model files. **Execute `python setup.py rnn` for training RNN model, `python setup.py markov` for training Markov chains.** The model files will be placed in `cache/` directory. Run `python setup.py clean` to remove the `cache/` directory.
 
 **For now the trained RNN model files are not properly named, so the program won't work unless you change the value of `RNN_MODEL_PATH` in `configs.py` to the RNN model you are going to use.**
 
