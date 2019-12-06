@@ -4,7 +4,7 @@ import sys
 import termios
 from termcolor import colored
 
-from setup import setup_markov, setup_rnn, clean_cache
+from setup import setup_dataset, setup_markov, setup_rnn, clean_cache
 from audio_stream.audio_stream import AudioStream
 from audio_stream.configs import TEMP_AUDIO_NAME
 from configs import CACHE_PATH, MARKOV_MODEL_PATH, RNN_MODEL_PATH
