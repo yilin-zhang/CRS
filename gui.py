@@ -13,9 +13,7 @@ from chord_recommendation.configs import *
 from chord_recommendation.markov_model import MarkovModel
 from chord_recommendation.rnn_model import RnnModel
 
-# TODO: Put the function into the module
-from chroma_chord_detection import chord_detection
-
+from chord_recognition.chord_recog import chord_recognition
 
 class CliGui():
     def __init__(self):
@@ -127,8 +125,9 @@ class CliGui():
             termios.tcflush(sys.stdin, termios.TCIFLUSH) # flush input buffer
                 
             # Chord recognition
-            chord = chord_detection(self.temp_audio_path)
-            chords.append(chord)
+            chord_sequence = chord_recognition(self.temp_audio_path)
+            #chords.append(chord)
+            chords += chord_sequence
             stream.clean()
             # print chord chain
             self._print_chord_chain(chords)

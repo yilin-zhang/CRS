@@ -11,7 +11,7 @@ class RnnModel():
         - dropout_rate: Dropout rate.
         '''
         model_input = layers.Input(batch_shape=(None, N_STEPS, N_INPUT))
-        x = layers.LSTM(
+        x = layers.SimpleRNN(
             N_NEURONS, activation='elu', return_sequences=True)(model_input)
         output = layers.Dense(
             N_INPUT, activation='softmax', name='output')(x)

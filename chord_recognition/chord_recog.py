@@ -1,11 +1,11 @@
 import numpy as np
 from sklearn.externals import joblib
-import sounddevice as sd
+#import sounddevice as sd
 import librosa as lb
 import matplotlib.pyplot as plt
-import drawnow
+#import drawnow
 import pandas as pd
-import feature
+import chord_recognition.feature as feature
 from collections import Counter
 import timeit
 
@@ -76,13 +76,13 @@ def most_frequent(List):
 	return occurence_count.most_common(1)[0][0] 
 
 def chord_recognition(wav_file_path):
-    df = pd.read_csv('./data/data - Copy.csv')
+    df = pd.read_csv('chord_recognition/data - Copy.csv')
     df = pd.DataFrame(df)
     label = list(df['label'])
     from sklearn import preprocessing
     le = preprocessing.LabelEncoder()
     label_encoded = le.fit_transform(label)
-    model = load_model('./model/gnb_mine.pkl')
+    model = load_model('chord_recognition/gnb_mine.pkl')
     wave_peak, result = realtime_recognition(model, le, wav_file_path)
     final_result = []
     j = len(result) / len(wave_peak)
