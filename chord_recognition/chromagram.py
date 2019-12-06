@@ -38,7 +38,6 @@ def compute_hann(iWindowLength):
 def compute_stft(xb, fs, block_size, hop_size):
 
     numBlocks = xb.shape[0]
-    print(numBlocks)
     afWindow = compute_hann(xb.shape[1])
     X = np.zeros([math.ceil(xb.shape[1] / 2 + 1), numBlocks])
 
@@ -53,28 +52,21 @@ def compute_stft(xb, fs, block_size, hop_size):
     return X, fs
 
 
-def HPS(X, order):
-
-    num_blocks = X.shape[1]
-    total_bins = X.shape[0]
-    freqRange = int(np.ceil((total_bins) / (order)))
-    hps = np.ones((freqRange, num_blocks))
-
-    for i in np.arange(freqRange):
-        for n in np.arange(num_blocks):
-            count = 0
-            idx = i
-            while count < order:
-                if i == 0:
-                    hps[i,n] *= X[idx,n]
-                    idx += 1
-                    count += 1
-                else:
-                    hps[i,n] *= X[idx,n]
-                    idx = (2**order) * i
-                    count += 1
-                    if idx >= total_bins:
-                        break
+def HPS(X, fs, order):
+    freqRange = int((len(X[0]) - 1) / order)
+    # print len(X)
+    # print X.shape
+    f0 = np.zeros((1, len(X)))
+    hps = np.zeros((len(X), freqRange))
+    freqSpread = np.linspace(0, fs / 2, len(X[0]))
+    for h in range(len(X)):
+        for i in range(freqRange):
+            multiplier = 1
+            for j in range(1, order + 1):
+                multiplier = multiplier * (X[h, i * j])
+            hps[h, i] = multiplier
+            if max(hps[h, :]) > 10 ** 10:
+                hps[h, :] = hps[h, :] / max(hps[h, :])
 
     return hps
 
@@ -83,9 +75,9 @@ def extract_pitch_chroma(X, fs, tfInHz, baseline_ver = 2):
     if baseline_ver == 1:
         Y = np.abs(X) ** 2
     elif baseline_ver == 2:
-        Y = HPS(X, 2)
+        Y = HPS(X, fs, 2)
     else:
-        Y = HPS(X, 2)
+        Y = HPS(X, fs, 2)
 
     # Need to calculate pitch chroma from C3 to B5 --> 48 to 83
     lower_bound = 48
