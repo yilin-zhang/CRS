@@ -15,15 +15,6 @@ def load_model(model_path):
 
     return model
 
-# print(sd.query_devices())
-df = pd.read_csv('./data/data - Copy.csv')
-df = pd.DataFrame(df)
-label = list(df['label'])
-from sklearn import preprocessing
-le = preprocessing.LabelEncoder()
-label_encoded = le.fit_transform(label)
-model = load_model('./model/gnb_mine.pkl')
-
 
 
 
@@ -84,14 +75,15 @@ def most_frequent(List):
 	occurence_count = Counter(List) 
 	return occurence_count.most_common(1)[0][0] 
 
-
-if __name__ == "__main__":
-    start = timeit.default_timer()
-    # wav_file_path = 'C:/Users/bhxxl/Desktop/Project - Copy/ACR/chord audio/A Min.wav'
-    wav_file_path = 'C:/Users/bhxxl/Desktop/Project - Copy/chords/D-15634125.wav'
+def chord_recognition(wav_file_path):
+    df = pd.read_csv('./data/data - Copy.csv')
+    df = pd.DataFrame(df)
+    label = list(df['label'])
+    from sklearn import preprocessing
+    le = preprocessing.LabelEncoder()
+    label_encoded = le.fit_transform(label)
+    model = load_model('./model/gnb_mine.pkl')
     wave_peak, result = realtime_recognition(model, le, wav_file_path)
-    # print(result)
-    # take the majority of each chord played
     final_result = []
     j = len(result) / len(wave_peak)
     for i in range(0,len(wave_peak)):
@@ -99,10 +91,33 @@ if __name__ == "__main__":
         # print(temp)
         final_result.append(most_frequent(temp))
     final_result = [x.split(" ") for x in final_result]
-    print(final_result)
+    # print(final_result)
     for i in range(0,len(final_result)):
         final_result[i][1] = final_result[i][1].lower()
         final_result[i] = tuple(final_result[i])
+    # print(final_result)
+    return final_result
+
+if __name__ == "__main__":
+    # start = timeit.default_timer()
+    wav_file_path = 'C:/Users/bhxxl/Desktop/Project - Copy/ACR/chord audio/A Min.wav'
+    # wav_file_path = 'C:/Users/bhxxl/Desktop/Project - Copy/chords/D-15634125.wav'
+    # wave_peak, result = realtime_recognition(model, le, wav_file_path)
+    # # print(result)
+    # # take the majority of each chord played
+    # final_result = []
+    # j = len(result) / len(wave_peak)
+    # for i in range(0,len(wave_peak)):
+    #     temp = result[int(i*j):int((i+1)*j)]
+    #     # print(temp)
+    #     final_result.append(most_frequent(temp))
+    # final_result = [x.split(" ") for x in final_result]
+    # print(final_result)
+    # for i in range(0,len(final_result)):
+    #     final_result[i][1] = final_result[i][1].lower()
+    #     final_result[i] = tuple(final_result[i])
+    # print(final_result)
+    # stop = timeit.default_timer()
+    # print('Time: ', stop-start)
+    final_result = chord_recognition(wav_file_path)
     print(final_result)
-    stop = timeit.default_timer()
-    print('Time: ', stop-start)
