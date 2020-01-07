@@ -1,4 +1,21 @@
 # Chord Recommendation System
+```
+   __________  _____
+  / ____/ __ \/ ___/
+ / /   / /_/ /\__ \
+/ /___/ _, _/___/ /
+\____/_/ |_|/____/
+Chord Recognition System
+```
+
+![](./img/rnn-chord-recog.gif)
+
+MUSI 6201 final project.
+
+## Contributors
+- [yilin-zhang](https://github.com/yilin-zhang/)
+- [Rishikeshdaoo](https://github.com/Rishikeshdaoo)
+- [CharlesThaCat](https://github.com/CharlesThaCat)
 
 ## Preparation
 The only thing that should be set up first is the machine-learning-based chord recommendation. The dataset we use is [McGill Billboard dataset](https://www.dropbox.com/s/2lvny9ves8kns4o/billboard-2.0-salami_chords.tar.gz?dl=1).
